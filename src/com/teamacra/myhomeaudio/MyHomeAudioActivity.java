@@ -1,6 +1,5 @@
 package com.teamacra.myhomeaudio;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.bluetooth.BluetoothAdapter;
