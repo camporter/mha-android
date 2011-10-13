@@ -3,6 +3,7 @@ package com.teamacra.myhomeaudio;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +20,20 @@ public class MyHomeAudioActivity extends TabActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		checkConnectivity();
+		checkBluetooth();
 		addTabs();
+	}
+
+	/**
+	 * Checks if Bluetooth is on. Prompts user to turn it on if it is off.
+	 */
+	private void checkBluetooth() {
+		//Check if bluetooth is on, if not, turn it on
+		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+		if (!adapter.isEnabled()) {
+			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			startActivityForResult(enableBTIntent, 0);
+		}
 	}
 
 	/**
