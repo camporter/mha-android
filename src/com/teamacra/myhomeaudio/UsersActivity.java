@@ -9,6 +9,7 @@ public class UsersActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		this.setContentView(R.layout.users);
 		
 		//TextView tv = new TextView(this);
 		//tv.setText("test");

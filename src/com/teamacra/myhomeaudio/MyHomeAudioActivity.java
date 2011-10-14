@@ -111,12 +111,12 @@ public class MyHomeAudioActivity extends TabActivity {
 		tabHost.addTab(roomsTabSpec);
 
 		// The "settings" tab
-		Intent settingsIntent = new Intent().setClass(this,
-				SettingsActivity.class);
-		TabHost.TabSpec settingsTabSpec;
-		settingsTabSpec = tabHost.newTabSpec("settings")
-				.setIndicator("Settings").setContent(settingsIntent);
-		tabHost.addTab(settingsTabSpec);
+		Intent preferencesIntent = new Intent().setClass(this,
+				PreferencesActivity.class);
+		TabHost.TabSpec preferencesTabSpec;
+		preferencesTabSpec = tabHost.newTabSpec("Preferences")
+				.setIndicator("Preferences").setContent(preferencesIntent);
+		tabHost.addTab(preferencesTabSpec);
 
 	}
 }

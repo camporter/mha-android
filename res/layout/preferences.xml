@@ -7,14 +7,15 @@
     <Button android:id="@+id/finder"
     		android:layout_height="wrap_content"
 			android:text="Find a Node" android:layout_width="match_parent"/>
-    <TextView android:text="This view will show the available nodes." 
+    <TextView android:text="This view will allow the user to modify their preferences." 
     		  android:id="@+id/textView1" 
     		  android:textAppearance="?android:attr/textAppearanceLarge"
     		  android:layout_width="wrap_content" 
     		  android:layout_height="wrap_content">
     </TextView>
-    <TextView android:text="Future revisions will handle this feature automatically." 
+    <CheckBox android:text="Turn MyHomeAudio on"
+    		  android:id="@+id/checkBox1" 
     		  android:layout_width="wrap_content" 
-    		  android:layout_height="wrap_content" 
-    		  android:id="@+id/textView2"></TextView>    
+    		  android:layout_height="wrap_content">
+    </CheckBox>
 </LinearLayout>
