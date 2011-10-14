@@ -4,11 +4,17 @@
   android:orientation="vertical"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-    <TextView android:text="This is where the media player controls will reside." 
-    		  android:id="@+id/textView1"
+    <TextView android:text="This view is where the media player controls will reside." 
+    		  android:id="@+id/notice"
     		  android:textAppearance="?android:attr/textAppearanceLarge"
     		  android:layout_width="wrap_content" 
     		  android:layout_height="wrap_content">
     </TextView>
+    
+    <TextView android:text="Ex: Play/pause, fast forward, rewind, skip forward, skip back, track information, etc." 
+    		  android:id="@+id/details" 
+    		  android:layout_width="wrap_content" 
+    		  android:layout_height="wrap_content">
+	</TextView>
     
 </LinearLayout>

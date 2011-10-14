@@ -4,18 +4,53 @@
   android:orientation="vertical"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-    <Button android:id="@+id/finder"
-    		android:layout_height="wrap_content"
-			android:text="Find a Node" android:layout_width="match_parent"/>
+			
     <TextView android:text="This view will allow the user to modify their preferences." 
-    		  android:id="@+id/textView1" 
+    		  android:id="@+id/notice" 
     		  android:textAppearance="?android:attr/textAppearanceLarge"
     		  android:layout_width="wrap_content" 
     		  android:layout_height="wrap_content">
     </TextView>
+    
+    <TextView android:textAppearance="?android:attr/textAppearanceMedium" 
+    		  android:id="@+id/header1"
+    		  android:layout_width="wrap_content" 
+    		  android:text="Current Preferences:" 
+    		  android:layout_height="wrap_content">
+ 	</TextView>
+    
     <CheckBox android:text="Turn MyHomeAudio on"
-    		  android:id="@+id/checkBox1" 
+    		  android:id="@+id/turnOn" 
     		  android:layout_width="wrap_content" 
     		  android:layout_height="wrap_content">
     </CheckBox>
+    
+    <TextView android:text="Volume" 
+    		  android:id="@+id/volLabel" 
+    		  android:layout_width="wrap_content" 
+    		  android:layout_height="wrap_content">
+    </TextView>
+    
+    <SeekBar android:id="@+id/volume" 
+    		 android:layout_height="wrap_content"
+    		 android:layout_width="231dp">
+    </SeekBar>
+    
+ 	<TextView android:textAppearance="?android:attr/textAppearanceMedium" 
+ 			  android:id="@+id/header2" 
+ 			  android:layout_width="wrap_content" 
+ 			  android:text="System Preferences" 
+ 			  android:layout_height="wrap_content">
+	</TextView>
+
+   	<TextView android:text="Default Stream"
+ 			  android:id="@+id/defaultLabel" 
+ 			  android:layout_width="wrap_content" 
+ 			  android:layout_height="wrap_content">
+	</TextView>
+
+ 	<Spinner android:layout_height="wrap_content" 
+ 			 android:layout_width="match_parent"
+ 			 android:id="@+id/defaultStream">
+	</Spinner>
 </LinearLayout>
