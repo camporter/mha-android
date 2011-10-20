@@ -7,6 +7,8 @@
 package com.teamacra.myhomeaudio;
 
 public interface ServerInterface {
+
+	//INITIALIZATION
 	
 	/**
 	 * Searches the local network for a server and connects if one is found
@@ -35,5 +37,60 @@ public interface ServerInterface {
 	 */
 	public Node connectToNode(String id);
 	
-	//TODO: Continue ServerInterface.java
+	//SYSTEM MODIFICATION
+	
+	/**
+	 * Gets the current user preferences.
+	 * @return The user's Preferences, or null if the user is not logged in.
+	 */
+	public Prefs getPrefs();
+	
+	/**
+	 * Updates the user's preferences.
+	 * @param userPrefs A set of Preferences to apply to the current user.
+	 * @return True if the preferences are updated successfully.
+	 */
+	public boolean setPrefs(Prefs userPrefs);
+	
+	/**
+	 * Adds a user to the system.
+	 * @param u The user to add.
+	 * @return True on success.
+	 */
+	public boolean addUser(User u);
+	
+	//AUDIO CONTROLS
+	
+	/**
+	 * Plays the default stream.
+	 * @return True on success.
+	 */
+	public boolean play();
+	
+	/**
+	 * Plays a specified stream.
+	 * @param s The Stream to play.
+	 * @return True on success.
+	 */
+	public boolean play(Stream s);
+	
+	/**
+	 * Pauses the currently playing stream.
+	 * @return True on success.
+	 */
+	public boolean pause();
+	
+	/**
+	 * Skips to the next entry in the current stream.
+	 * e.g. Skip to the next song in a playlist.
+	 * @return True on success.
+	 */
+	public boolean next();
+	
+	/**
+	 * Skips to the previous entry in the current stream.
+	 * e.g. Skip to the previous song in a playlist.
+	 * @return
+	 */
+	public boolean prev();
 }
