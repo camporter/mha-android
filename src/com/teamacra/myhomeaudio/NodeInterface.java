@@ -1,11 +1,12 @@
 /**
- * Filename: Node.java
+ * Filename: NodeInterface.java
  * 
  * Description: Holds all of the relevant information about an MHA node.
  */
 
 package com.teamacra.myhomeaudio;
 
-public class Node {
-	//TODO: Write Node class
+public interface NodeInterface {
+	//TODO: Write Node interface
+	
 }

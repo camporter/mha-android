@@ -25,7 +25,8 @@ public interface ServerInterface {
 	 * 			null if authentication failed.
 	 */
 	//TODO: password encryption details
-	public User authenticateUser(String username, String deviceID, String encryptedPassword);
+	public UserInterface authenticateUser(String username, String deviceID,
+			String encryptedPassword);
 	
 	/**
 	 * Takes a Bluetooth ID from a found device, and submits it to the server.
@@ -35,7 +36,7 @@ public interface ServerInterface {
 	 * @return A Node object corresponding to the physical node with this
 	 * 			id, or null if no such node exists on the system
 	 */
-	public Node connectToNode(String id);
+	public NodeInterface connectToNode(String id);
 	
 	//SYSTEM MODIFICATION
 	
@@ -43,21 +44,27 @@ public interface ServerInterface {
 	 * Gets the current user preferences.
 	 * @return The user's Preferences, or null if the user is not logged in.
 	 */
-	public Prefs getPrefs();
+	public PrefsInterface getPrefs();
 	
 	/**
 	 * Updates the user's preferences.
 	 * @param userPrefs A set of Preferences to apply to the current user.
 	 * @return True if the preferences are updated successfully.
 	 */
-	public boolean setPrefs(Prefs userPrefs);
+	public boolean setPrefs(PrefsInterface userPrefs);
 	
 	/**
 	 * Adds a user to the system.
 	 * @param u The user to add.
 	 * @return True on success.
 	 */
-	public boolean addUser(User u);
+	public boolean addUser(UserInterface u);
+	
+	/**
+	 * Returns all streams available to the user.
+	 * @return An array of Streams.
+	 */
+	public StreamInterface[] getAvailableStreams();
 	
 	//AUDIO CONTROLS
 	
@@ -72,7 +79,7 @@ public interface ServerInterface {
 	 * @param s The Stream to play.
 	 * @return True on success.
 	 */
-	public boolean play(Stream s);
+	public boolean play(StreamInterface s);
 	
 	/**
 	 * Pauses the currently playing stream.
