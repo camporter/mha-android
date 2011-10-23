@@ -9,24 +9,35 @@ package com.teamacra.myhomeaudio;
 public interface ServerInterface {
 
 	//INITIALIZATION
-	
 	/**
 	 * Searches the local network for a server and connects if one is found
 	 * @return True if successfully connected to an MHA server
 	 */
-	public boolean findServer();
+	public boolean connect();
+	
+	/**
+	 * Connects to a specified server
+	 * @param ipAddress The IP address of the server
+	 * @return True on success
+	 */
+	public boolean connect(String ipAddress);
+	
+	/**
+	 * Disconnects from the server
+	 * @return True on success
+	 */
+	public boolean disconnect();
 	
 	/**
 	 * Authenticates a user with the MHA server
 	 * @param username The username on the system
 	 * @param deviceID An ID, unique on the system, to the user's device
-	 * @param encryptedPassword The user's system password
+	 * @param hashedPassword The user's system password
 	 * @return A User object corresponding to the authenticated user, or
 	 * 			null if authentication failed.
 	 */
-	//TODO: password encryption details
-	public UserInterface authenticateUser(String username, String deviceID,
-			String encryptedPassword);
+	public UserInterface login(String username, String deviceID,
+			String hashedPassword);
 	
 	/**
 	 * Takes a Bluetooth ID from a found device, and submits it to the server.
@@ -39,65 +50,36 @@ public interface ServerInterface {
 	public NodeInterface connectToNode(String id);
 	
 	//SYSTEM MODIFICATION
-	
-	/**
-	 * Gets the current user preferences.
-	 * @return The user's Preferences, or null if the user is not logged in.
-	 */
-	public PrefsInterface getPrefs();
-	
-	/**
-	 * Updates the user's preferences.
-	 * @param userPrefs A set of Preferences to apply to the current user.
-	 * @return True if the preferences are updated successfully.
-	 */
-	public boolean setPrefs(PrefsInterface userPrefs);
-	
 	/**
 	 * Adds a user to the system.
 	 * @param u The user to add.
 	 * @return True on success.
 	 */
 	public boolean addUser(UserInterface u);
+
+	/**
+	 * Removes a user from the system
+	 * @param u The UserInterface to remove
+	 * @return True on success
+	 */
+	public boolean removeUser(UserInterface u);
+
+	/**
+	 * Updates a user on the system
+	 * @param u The UserInterface to update
+	 * @return True on success
+	 */
+	public boolean updateUser(UserInterface u);
+
+	/**
+	 * Returns a list of all users on the system
+	 * @return A UserInterface array of all the users
+	 */
+	public UserInterface[] listUsers();
 	
 	/**
 	 * Returns all streams available to the user.
 	 * @return An array of Streams.
 	 */
 	public StreamInterface[] getAvailableStreams();
-	
-	//AUDIO CONTROLS
-	
-	/**
-	 * Plays the default stream.
-	 * @return True on success.
-	 */
-	public boolean play();
-	
-	/**
-	 * Plays a specified stream.
-	 * @param s The Stream to play.
-	 * @return True on success.
-	 */
-	public boolean play(StreamInterface s);
-	
-	/**
-	 * Pauses the currently playing stream.
-	 * @return True on success.
-	 */
-	public boolean pause();
-	
-	/**
-	 * Skips to the next entry in the current stream.
-	 * e.g. Skip to the next song in a playlist.
-	 * @return True on success.
-	 */
-	public boolean next();
-	
-	/**
-	 * Skips to the previous entry in the current stream.
-	 * e.g. Skip to the previous song in a playlist.
-	 * @return
-	 */
-	public boolean prev();
 }
