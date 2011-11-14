@@ -24,12 +24,16 @@ import com.teamacra.myhomeaudio.StreamInterface;
 public class HttpStream implements StreamInterface {
 	
 	private String host = "http://192.168.10.101:8080";
+	//private String host = "http://10.0.2.2:8080";
 	
 	public String[] getMediaList() {
 		String[] result = null;
 		HttpClient httpClient = new DefaultHttpClient();
-		HttpGet httpGet = new HttpGet(this.host+"/song/list");
 		try {
+			String t = this.host+"/song/list";
+			//HttpGet httpGet = new HttpGet(this.host+"/song/list");
+			System.out.println(t);
+			HttpGet httpGet = new HttpGet(t);
 			HttpResponse response = httpClient.execute(httpGet);
 			HttpEntity entity = response.getEntity();
 			
@@ -68,6 +72,10 @@ public class HttpStream implements StreamInterface {
 			
 		} catch (IOException e) {
 			e.printStackTrace();
+			result = null;
+		} catch(IllegalArgumentException e){
+			e.printStackTrace();
+			result = null;
 		}
 		return result;
 		

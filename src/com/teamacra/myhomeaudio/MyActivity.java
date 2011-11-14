@@ -35,12 +35,14 @@ public class MyActivity extends Activity {
 		
 		String[] mediaArray = new HttpStream().getMediaList();
 		
-		mediaListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mediaArray));
-		mediaListView.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				new HttpStream().play(((TextView)view).getText().toString());
-			}
-		});
+		if(mediaArray != null){
+			mediaListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mediaArray));
+			mediaListView.setOnItemClickListener(new OnItemClickListener() {
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					new HttpStream().play(((TextView)view).getText().toString());
+				}
+			});
+		}
 	}
 	
 }

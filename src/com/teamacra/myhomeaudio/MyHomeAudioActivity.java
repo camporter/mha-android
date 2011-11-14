@@ -29,9 +29,11 @@ public class MyHomeAudioActivity extends TabActivity {
 	private void checkBluetooth() {
 		//Check if bluetooth is on, if not, turn it on
 		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if (!adapter.isEnabled()) {
-			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBTIntent, 0);
+		if(adapter != null){
+			if (!adapter.isEnabled()) {
+				Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBTIntent, 0);
+			}
 		}
 	}
 
