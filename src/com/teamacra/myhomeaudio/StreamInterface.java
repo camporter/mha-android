@@ -17,9 +17,10 @@ public interface StreamInterface {
 	
 	/**
 	 * Gets the title of the currently playing song
+	 * TODO: Android Activity objects already have a getTitle method!
 	 * @return The title of the song
 	 */
-	public String getTitle();
+	//public String getTitle();
 	
 	/**
 	 * Gets the artist of the currently playing song
