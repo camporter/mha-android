@@ -13,6 +13,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
@@ -89,10 +90,10 @@ public class HttpStream implements StreamInterface {
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpPost httpPost = new HttpPost(this.host+"/song/play");
 		try {
-			List<NameValuePair> postVars = new ArrayList<NameValuePair>(1);
-			postVars.add(new BasicNameValuePair("media", name));
+			//List<NameValuePair> postVars = new ArrayList<NameValuePair>(1);
+			//postVars.add(new BasicNameValuePair("media", name));
 			
-			httpPost.setEntity(new UrlEncodedFormEntity(postVars));
+			httpPost.setEntity(new StringEntity("{\"song\":\""+name+"\"}\r\n\r\n"));
 			
 			HttpResponse response = httpClient.execute(httpPost);
 			
