@@ -55,4 +55,6 @@ public interface StreamInterface {
 	 * @return
 	 */
 	public boolean prev();
+
+	boolean play(String name);
 }
