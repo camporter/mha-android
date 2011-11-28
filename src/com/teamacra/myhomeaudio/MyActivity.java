@@ -26,6 +26,8 @@ import android.view.View;
 
 public class MyActivity extends Activity {
 	
+	String[] mediaArray;
+	
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
@@ -33,9 +35,9 @@ public class MyActivity extends Activity {
 		
 		ListView mediaListView = (ListView) findViewById(R.id.mediaListView);
 		
-		String[] mediaArray = new HttpStream().getMediaList();
+		this.mediaArray = new HttpStream().getMediaList();
 		
-		mediaListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mediaArray));
+		mediaListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, this.mediaArray));
 		mediaListView.setOnItemClickListener(new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				new HttpStream().play(((TextView)view).getText().toString());

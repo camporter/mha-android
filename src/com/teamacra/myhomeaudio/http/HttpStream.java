@@ -26,7 +26,7 @@ public class HttpStream implements StreamInterface {
 	private String host = "http://192.168.10.101:8080";
 	
 	public String[] getMediaList() {
-		String[] result = null;
+		String[] result = new String[0];
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(this.host+"/song/list");
 		try {

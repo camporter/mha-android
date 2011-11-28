@@ -1,5 +1,8 @@
 package com.teamacra.myhomeaudio;
 
+import com.teamacra.myhomeaudio.bluetooth.DiscoveryService;
+
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.bluetooth.BluetoothAdapter;
@@ -10,29 +13,65 @@ import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 public class MyHomeAudioActivity extends TabActivity {
+	private static final String TAG = "MyHomeAudio";
+	
+	// Constants defining the messages sent from the DiscoveryService handler
+	public static final int MESSAGE_STATE_CHANGE = 1;
+	public static final int MESSAGE_READ = 2;
+	public static final int MESSAGE_DEVICE_NAME = 4;
+	
+	// Intent request constants
+	private static final int REQUEST_ENABLE_BT = 3;
+	
+	private BluetoothAdapter mBluetoothAdapter = null;
+	
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.e(TAG, "+++ ON CREATE +++");
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		checkConnectivity();
-		checkBluetooth();
 		addTabs();
+		
+		this.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		
+		if (mBluetoothAdapter == null) {
+			Toast.makeText(this,"Bluetooth is not available on this device.", Toast.LENGTH_SHORT).show();
+			this.finish();
+			return;
+		}
+	}
+	
+	public void onStart() {
+		super.onStart();
+		Log.e(TAG, "++ ON START ++");
+
+		
+		if (checkBluetooth()) {
+			Log.e(TAG, "GOT HERE");
+			this.startService(new Intent(this, DiscoveryService.class));
+		}
 	}
 
 	/**
 	 * Checks if Bluetooth is on. Prompts user to turn it on if it is off.
 	 */
-	private void checkBluetooth() {
+	private boolean checkBluetooth() {
 		//Check if bluetooth is on, if not, turn it on
-		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if (!adapter.isEnabled()) {
+		if (!mBluetoothAdapter.isEnabled()) {
 			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBTIntent, 0);
+			startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+			return false;
 		}
+		return true;
 	}
 
 	/**
@@ -79,6 +118,22 @@ public class MyHomeAudioActivity extends TabActivity {
 			
 			AlertDialog alert = builder.create();
 			alert.show();
+		}
+	}
+	
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case REQUEST_ENABLE_BT:
+			if (resultCode == Activity.RESULT_OK) {
+				// Bluetooth was enabled, great
+				this.startService(new Intent(this, DiscoveryService.class));
+				
+			}
+			else {
+				// Didn't enable bluetooth! End the program
+				Toast.makeText(this, "Bluetooth must be available for My Home Audio to run.", Toast.LENGTH_SHORT).show();
+				finish();
+			}
 		}
 	}
 	
