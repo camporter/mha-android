@@ -23,7 +23,7 @@ public class DiscoveryService extends Service {
 	
 	private BluetoothAdapter mAdapter;
 	
-	private Set<BluetoothDevice> deviceList;
+	private ArrayList<BluetoothDevice> deviceList;
 	private Timer timer;
 	private int mState;
 	
@@ -55,6 +55,8 @@ public class DiscoveryService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Log.i(TAG, "MHA DiscoveryService being created!");
+		
+		deviceList = new ArrayList<BluetoothDevice>();
 		
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
@@ -105,8 +107,12 @@ public class DiscoveryService extends Service {
 			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 				Log.i(TAG, "Device was found!");
 				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+				
+				Integer rssi = (int) intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, (short) 0);
 				deviceList.add(device);
+				
 				Log.i(TAG, device.getName());
+				Log.i(TAG, String.valueOf(rssi));
 				
 			}
 			else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
