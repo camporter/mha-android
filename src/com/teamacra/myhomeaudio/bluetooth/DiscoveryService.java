@@ -21,6 +21,8 @@ import android.util.Log;
 public class DiscoveryService extends Service {
 	private final String TAG = "DiscoveryService";
 	
+	public static final String DEVICE_UPDATE = "com.teamacra.myhomeaudio.bluetooth";
+	
 	private BluetoothAdapter mAdapter;
 	
 	private ArrayList<BluetoothDevice> deviceList;
@@ -110,9 +112,12 @@ public class DiscoveryService extends Service {
 				
 				Integer rssi = (int) intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, (short) 0);
 				deviceList.add(device);
-				
 				Log.i(TAG, device.getName());
 				Log.i(TAG, String.valueOf(rssi));
+				Intent bIntent = new Intent();
+				bIntent.setAction(DiscoveryService.DEVICE_UPDATE);
+				bIntent.putParcelableArrayListExtra("devices", deviceList);
+				context.sendBroadcast(bIntent);
 				
 			}
 			else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {

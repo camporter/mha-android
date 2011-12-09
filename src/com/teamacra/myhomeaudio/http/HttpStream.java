@@ -3,37 +3,34 @@ package com.teamacra.myhomeaudio.http;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.content.SharedPreferences;
 import com.teamacra.myhomeaudio.StreamInterface;
 
 public class HttpStream implements StreamInterface {
 	
-	private String host = "http://192.168.10.101:8080";
-	//private String host = "http://10.0.2.2:8080";
+	private String host;
+	
+	public HttpStream(SharedPreferences prefs) {
+		this.host = prefs.getString("host", "");
+	}
 	
 	public String[] getMediaList() {
 		String[] result = new String[0];
 		HttpClient httpClient = new DefaultHttpClient();
 		try {
-			String t = this.host+"/song/list";
-			//HttpGet httpGet = new HttpGet(this.host+"/song/list");
-			System.out.println(t);
-			HttpGet httpGet = new HttpGet(t);
+			String url = this.host+"/song/list";
+			System.out.println(url);
+			HttpGet httpGet = new HttpGet(url);
 			HttpResponse response = httpClient.execute(httpGet);
 			HttpEntity entity = response.getEntity();
 			

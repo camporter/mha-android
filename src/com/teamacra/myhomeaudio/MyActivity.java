@@ -15,6 +15,7 @@ import org.json.JSONException;
 import com.teamacra.myhomeaudio.http.HttpStream;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -30,18 +31,20 @@ public class MyActivity extends Activity {
 	
 	public void onCreate(Bundle savedInstanceState)
 	{
+		final SharedPreferences sharedPreferences = getSharedPreferences(MyHomeAudioActivity.PREFS_NAME, 0);
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.my);
 		
 		ListView mediaListView = (ListView) findViewById(R.id.mediaListView);
 		
-		this.mediaArray = new HttpStream().getMediaList();
+		this.mediaArray = new HttpStream(sharedPreferences).getMediaList();
 		
 		if(mediaArray != null) {
 			mediaListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mediaArray));
 			mediaListView.setOnItemClickListener(new OnItemClickListener() {
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					new HttpStream().play(((TextView)view).getText().toString());
+					new HttpStream(sharedPreferences).play(((TextView)view).getText().toString());
 				}
 			});
 		}
