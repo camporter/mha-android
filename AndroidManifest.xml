@@ -30,6 +30,6 @@
         <activity android:name=".PreferencesActivity"
                   android:label="@string/app_name">
         </activity>
-        <service android:enabled="true" android:name=".bluetooth.DiscoveryService"/>
+        <service android:enabled="true" android:name=".bluetooth.DiscoveryService" android:process=":DiscoveryService"/>
     </application>
 </manifest>

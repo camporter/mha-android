@@ -57,6 +57,8 @@ public class MyHomeAudioActivity extends TabActivity {
 			this.finish();
 			return;
 		}
+		
+		addTabs();
 	}
 
 	public void onStart() {
@@ -67,8 +69,6 @@ public class MyHomeAudioActivity extends TabActivity {
 			Log.e(TAG, "GOT HERE");
 			this.startService(new Intent(this, DiscoveryService.class));
 		}
-		
-		addTabs();
 	}
 
 	/**

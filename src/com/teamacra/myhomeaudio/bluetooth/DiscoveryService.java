@@ -1,11 +1,14 @@
 package com.teamacra.myhomeaudio.bluetooth;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.teamacra.myhomeaudio.MyHomeAudioActivity;
+import com.teamacra.myhomeaudio.http.HttpNodeClient;
+import com.teamacra.myhomeaudio.http.HttpStream;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -25,7 +28,7 @@ public class DiscoveryService extends Service {
 	
 	private BluetoothAdapter mAdapter;
 	
-	private ArrayList<BluetoothDevice> deviceList;
+	private ArrayList<String> deviceList;
 	private Timer timer;
 	private int mState;
 	
@@ -40,8 +43,8 @@ public class DiscoveryService extends Service {
 		return mState;
 	}
 	
-	public synchronized ArrayList<BluetoothDevice> getDeviceList() {
-		return new ArrayList<BluetoothDevice>(deviceList);
+	public synchronized ArrayList<String> getDeviceList() {
+		return new ArrayList<String>(deviceList);
 	}
 	
 	private synchronized void setState(int state) {
@@ -58,11 +61,13 @@ public class DiscoveryService extends Service {
 		super.onCreate();
 		Log.i(TAG, "MHA DiscoveryService being created!");
 		
-		deviceList = new ArrayList<BluetoothDevice>();
+		deviceList = new ArrayList<String>();
 		
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+		
+		bluetoothThread.start();
 		
 	}
 	
@@ -70,28 +75,41 @@ public class DiscoveryService extends Service {
 	public void onStart(Intent intent, int startid) {
 		Log.i(TAG, "MHA DiscoveryService being started");
 		
+		/*while (true) {
+			Log.i(TAG, "bluetooth discovery again");
+			mAdapter.startDiscovery();
+			try {
+				Thread.sleep(30*1000L);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				
+			}
+		}*/
+		
 		if (timer != null) {
-			updateTask.cancel();
-			timer.cancel();
-			timer.purge();
+			
 		}
-
-		timer = new Timer("DiscoveryServiceTimer");
-		timer.schedule(updateTask, 0, 30*1000L);
+		else {
+			timer = new Timer("DiscoveryServiceTimer");
+			timer.schedule(updateTask, 0, 30*1000L);
+		}
 	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		Log.i(TAG, "MHA DiscoveryService being destroyed!");
+		
 		timer.cancel();
 		timer = null;
+		
 	}
 	
 	private TimerTask updateTask = new TimerTask() {
 		@Override
 		public void run() {
 			Log.i(TAG, "Running discovery...");
+			
 			if (!discoveryRunning) {
 				Log.i(TAG, "Discovery isn't already running...");
 				mAdapter.startDiscovery();
@@ -100,29 +118,51 @@ public class DiscoveryService extends Service {
 		}
 	};
 	
+	private Thread bluetoothThread = new Thread() {
+		public void run() {
+			
+		}
+	};
+	
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			
-			// Discovery has found a device
 			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+				// Discovery has found a device
 				Log.i(TAG, "Device was found!");
-				BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				
+				// Get the corresponding BluetoothDevice object
+				final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+				
+				// get the RSSI value for this action
 				Integer rssi = (int) intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, (short) 0);
-				deviceList.add(device);
+				
+				deviceList.add(device.getName());
+				deviceList.add(String.valueOf(rssi));
+				
 				Log.i(TAG, device.getName());
 				Log.i(TAG, String.valueOf(rssi));
-				Intent bIntent = new Intent();
-				bIntent.setAction(DiscoveryService.DEVICE_UPDATE);
-				bIntent.putParcelableArrayListExtra("devices", deviceList);
-				context.sendBroadcast(bIntent);
+				
+				
+				//Intent bIntent = new Intent();
+				
+				// TODO: Fix this to send RSSIs as well, some other data struct needed
+				//bIntent.setAction(DiscoveryService.DEVICE_UPDATE);
+				//bIntent.putParcelableArrayListExtra("devices", deviceList);
+				//context.sendBroadcast(bIntent);
+				
 				
 			}
 			else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-				discoveryRunning = false;
+				// Done trying to discover bluetooth devices
 				Log.i(TAG, "Discovery finished!");
+				
+				HttpNodeClient httpNC = new HttpNodeClient(getSharedPreferences(MyHomeAudioActivity.PREFS_NAME, 0));
+				httpNC.sendRSSIValues(deviceList);
+				
+				discoveryRunning = false;
 			}
 			
 		}
