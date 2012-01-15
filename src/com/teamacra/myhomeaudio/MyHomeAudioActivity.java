@@ -1,19 +1,30 @@
 package com.teamacra.myhomeaudio;
 
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.teamacra.myhomeaudio.bluetooth.DiscoveryService;
+import com.teamacra.myhomeaudio.http.HttpNodeClient;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.widget.TabHost;
 import android.widget.Toast;
@@ -33,16 +44,24 @@ public class MyHomeAudioActivity extends TabActivity {
 	private static final int REQUEST_ENABLE_BT = 3;
 
 	private BluetoothAdapter mBluetoothAdapter = null;
+	
+	private ArrayList<String> deviceList;
+	
+	private Timer timer;
+	private int mState;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.e(TAG, "+++ ON CREATE +++");
 		
+		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+		
 		// Set the server that we will use
 		SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
-		editor.putString("host", "http://192.168.10.101:8080");
+		editor.putString("host", "http://192.168.68.160:8080");
+		editor.putString("localIP", Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress()));
 		editor.commit();
 		
 		super.onCreate(savedInstanceState);
@@ -58,6 +77,16 @@ public class MyHomeAudioActivity extends TabActivity {
 			return;
 		}
 		
+		// let the server know the client is ready
+		new HttpNodeClient(getSharedPreferences(MyHomeAudioActivity.PREFS_NAME, 0)).sendStart();
+		
+		deviceList = new ArrayList<String>();
+		
+		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
+		
 		addTabs();
 	}
 
@@ -66,10 +95,29 @@ public class MyHomeAudioActivity extends TabActivity {
 		Log.e(TAG, "++ ON START ++");
 
 		if (checkBluetooth()) {
-			Log.e(TAG, "GOT HERE");
-			this.startService(new Intent(this, DiscoveryService.class));
+			//this.startService(new Intent(this, DiscoveryService.class));
+			if (timer != null) {
+				
+			}
+			else {
+				timer = new Timer("DiscoveryServiceTimer");
+				timer.schedule(updateTask, 0, 30*1000L);
+			}
 		}
 	}
+	
+	private TimerTask updateTask = new TimerTask() {
+		@Override
+		public void run() {
+			Log.i(TAG, "Trying to run discovery...");
+			
+			if (!mBluetoothAdapter.isDiscovering()) {
+				Log.i(TAG, "Discovery isn't already running...");
+				mBluetoothAdapter.startDiscovery();
+				Log.i(TAG, "Discovering: "+mBluetoothAdapter.isDiscovering());
+			}
+		}
+	};
 
 	/**
 	 * Checks if Bluetooth is on. Prompts user to turn it on if it is off.
@@ -133,7 +181,7 @@ public class MyHomeAudioActivity extends TabActivity {
 		case REQUEST_ENABLE_BT:
 			if (resultCode == Activity.RESULT_OK) {
 				// Bluetooth was enabled, great
-				this.startService(new Intent(this, DiscoveryService.class));
+				//this.startService(new Intent(this, DiscoveryService.class));
 
 			} else {
 				// Didn't enable bluetooth! End the program
@@ -144,6 +192,52 @@ public class MyHomeAudioActivity extends TabActivity {
 		}
 	}
 
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			
+			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+				// Discovery has found a device
+				Log.i(TAG, "Device was found!");
+				
+				// Get the corresponding BluetoothDevice object
+				final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+				
+				// get the RSSI value for this action
+				Integer rssi = (int) intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, (short) 0);
+				
+				deviceList.add(device.getName());
+				deviceList.add(String.valueOf(rssi));
+				
+				Log.i(TAG, device.getName());
+				Log.i(TAG, String.valueOf(rssi));
+				
+				
+				//Intent bIntent = new Intent();
+				
+				// TODO: Fix this to send RSSIs as well, some other data struct needed
+				//bIntent.setAction(DiscoveryService.DEVICE_UPDATE);
+				//bIntent.putParcelableArrayListExtra("devices", deviceList);
+				//context.sendBroadcast(bIntent);
+				
+				
+			}
+			else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+				// Done trying to discover bluetooth devices
+				Log.i(TAG, "Discovery finished!");
+				
+				HttpNodeClient httpNC = new HttpNodeClient(getSharedPreferences(MyHomeAudioActivity.PREFS_NAME, 0));
+				httpNC.sendRSSIValues(deviceList);
+				
+			}
+			else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+				Log.i(TAG, "Discovery STARTING!");
+			}
+			
+		}
+	};
+	
 	/**
 	 * Adds tabs to the main activity.
 	 */

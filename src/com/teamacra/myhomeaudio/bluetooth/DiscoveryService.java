@@ -29,10 +29,9 @@ public class DiscoveryService extends Service {
 	private BluetoothAdapter mAdapter;
 	
 	private ArrayList<String> deviceList;
+	
 	private Timer timer;
 	private int mState;
-	
-	boolean discoveryRunning = false;
 	
 	
 	public DiscoveryService() {
@@ -66,8 +65,9 @@ public class DiscoveryService extends Service {
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
+		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
 		
-		bluetoothThread.start();
+		//bluetoothThread.start();
 		
 	}
 	
@@ -108,19 +108,13 @@ public class DiscoveryService extends Service {
 	private TimerTask updateTask = new TimerTask() {
 		@Override
 		public void run() {
-			Log.i(TAG, "Running discovery...");
+			Log.i(TAG, "Trying to run discovery...");
 			
-			if (!discoveryRunning) {
+			if (!mAdapter.isDiscovering()) {
 				Log.i(TAG, "Discovery isn't already running...");
 				mAdapter.startDiscovery();
-				discoveryRunning = true;
+				Log.i(TAG, "Discovering: "+mAdapter.isDiscovering());
 			}
-		}
-	};
-	
-	private Thread bluetoothThread = new Thread() {
-		public void run() {
-			
 		}
 	};
 	
@@ -162,7 +156,9 @@ public class DiscoveryService extends Service {
 				HttpNodeClient httpNC = new HttpNodeClient(getSharedPreferences(MyHomeAudioActivity.PREFS_NAME, 0));
 				httpNC.sendRSSIValues(deviceList);
 				
-				discoveryRunning = false;
+			}
+			else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+				Log.i(TAG, "Discovery STARTING!");
 			}
 			
 		}
