@@ -24,10 +24,10 @@ public class HttpStream extends HttpBase implements StreamInterface {
 	
 	public String[] getMediaList() {
 		String[] result = new String[0];
-		HttpClient httpClient = new DefaultHttpClient();
+		
 		try {
 			String url = this.host+"/song/list";
-			System.out.println(url);
+			
 			HttpGet httpGet = new HttpGet(url);
 			HttpResponse response = httpClient.execute(httpGet);
 			HttpEntity entity = response.getEntity();
@@ -90,7 +90,6 @@ public class HttpStream extends HttpBase implements StreamInterface {
 
 	@Override
 	public boolean play(String name) {
-		HttpClient httpClient = new DefaultHttpClient();
 		HttpPost httpPost = new HttpPost(this.host+"/song/play");
 		try {
 			//List<NameValuePair> postVars = new ArrayList<NameValuePair>(1);
@@ -98,7 +97,7 @@ public class HttpStream extends HttpBase implements StreamInterface {
 			
 			httpPost.setEntity(new StringEntity("{\"song\":\""+name+"\"}\r\n\r\n"));
 			
-			HttpResponse response = httpClient.execute(httpPost);
+			HttpResponse response = this.httpClient.execute(httpPost);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -108,11 +107,10 @@ public class HttpStream extends HttpBase implements StreamInterface {
 
 	@Override
 	public boolean pause() {
-		HttpClient httpClient = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(this.host+"/song/pause");
 		try {
 			
-			HttpResponse response = httpClient.execute(httpGet);
+			HttpResponse response = this.httpClient.execute(httpGet);
 			
 		} catch (IOException e) {
 			e.printStackTrace();

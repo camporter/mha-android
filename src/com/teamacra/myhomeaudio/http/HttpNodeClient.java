@@ -24,7 +24,6 @@ public class HttpNodeClient extends HttpBase {
 	}
 	
 	public void sendRSSIValues(ArrayList<String> deviceList) {
-		HttpClient httpClient = new DefaultHttpClient();
 		
 		try {
 			String url = this.host+"/client/rssi";
@@ -50,13 +49,13 @@ public class HttpNodeClient extends HttpBase {
 			
 			httpPost.setEntity(new StringEntity(jsonOutput));
 			
-			HttpResponse response = httpClient.execute(httpPost);
+			HttpResponse response = this.httpClient.execute(httpPost);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void sendStart() {
+	/*public void sendStart() {
 		HttpClient httpClient = new DefaultHttpClient();
 		try {
 			String url = this.host+"/client/start";
@@ -65,9 +64,9 @@ public class HttpNodeClient extends HttpBase {
 			
 			
 			httpPost.setEntity(new StringEntity(this.localIPAddress));
-			HttpResponse response = httpClient.execute(httpPost);
+			HttpResponse response = this.httpClient.execute(httpPost);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 }

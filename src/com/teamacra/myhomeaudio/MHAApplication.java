@@ -20,6 +20,7 @@ public class MHAApplication extends Application {
 	private boolean isLoggedIn;
 	private String username;
 	private String password;
+	private String sessionId;
 
 	
 	@Override
@@ -38,9 +39,7 @@ public class MHAApplication extends Application {
 
 	@Override
 	public void onTerminate() {
-		this.isLoggedIn = false;
-		this.username = null;
-		this.password = null;
+		setLoggedOut();
 		Log.d(TAG, "Application terminated");
 		super.onTerminate();
 	}
@@ -49,10 +48,12 @@ public class MHAApplication extends Application {
 	 * Set the application state as logged in.
 	 * @param username Username for the user logged in.
 	 * @param password Password for the user logged in.
+	 * @param sessionId Session assigned to the client for the user.
 	 */
-	public void setLoggedIn(String username, String password) {
+	public void setLoggedIn(String username, String password, String sessionId) {
 		this.username = username;
 		this.password = password;
+		this.sessionId = sessionId;
 		this.isLoggedIn = true;
 	}
 	
@@ -63,6 +64,7 @@ public class MHAApplication extends Application {
 		this.isLoggedIn = false;
 		this.username = null;
 		this.password = null;
+		this.sessionId = null;
 	}
 	
 	/**
