@@ -16,12 +16,10 @@ import org.json.JSONException;
 import android.content.SharedPreferences;
 import com.teamacra.myhomeaudio.StreamInterface;
 
-public class HttpStream implements StreamInterface {
-	
-	private String host;
+public class HttpStream extends HttpBase implements StreamInterface {
 	
 	public HttpStream(SharedPreferences prefs) {
-		this.host = prefs.getString("host", "");
+		super(prefs);
 	}
 	
 	public String[] getMediaList() {

@@ -31,7 +31,7 @@ public class MyActivity extends Activity {
 	
 	public void onCreate(Bundle savedInstanceState)
 	{
-		final SharedPreferences sharedPreferences = getSharedPreferences(MyHomeAudioActivity.PREFS_NAME, 0);
+		final SharedPreferences sharedPreferences = getSharedPreferences(MHAApplication.PREFS_NAME, 0);
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.my);

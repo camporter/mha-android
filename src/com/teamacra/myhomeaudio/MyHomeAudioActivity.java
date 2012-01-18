@@ -33,8 +33,6 @@ public class MyHomeAudioActivity extends TabActivity {
 
 	private static final String TAG = "MyHomeAudio";
 
-	public static final String PREFS_NAME = "MyHomeAudioPrefs";
-
 	// Constants defining the messages sent from the DiscoveryService handler
 	public static final int MESSAGE_STATE_CHANGE = 1;
 	public static final int MESSAGE_READ = 2;
@@ -53,16 +51,6 @@ public class MyHomeAudioActivity extends TabActivity {
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.e(TAG, "+++ ON CREATE +++");
-		
-		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
-		
-		// Set the server that we will use
-		SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, 0);
-		SharedPreferences.Editor editor = sharedPreferences.edit();
-		editor.putString("host", "http://192.168.68.160:8080");
-		editor.putString("localIP", Formatter.formatIpAddress(wifiManager.getConnectionInfo().getIpAddress()));
-		editor.commit();
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
@@ -78,7 +66,7 @@ public class MyHomeAudioActivity extends TabActivity {
 		}
 		
 		// let the server know the client is ready
-		new HttpNodeClient(getSharedPreferences(MyHomeAudioActivity.PREFS_NAME, 0)).sendStart();
+		new HttpNodeClient(getSharedPreferences(MHAApplication.PREFS_NAME, 0)).sendStart();
 		
 		deviceList = new ArrayList<String>();
 		
@@ -227,7 +215,7 @@ public class MyHomeAudioActivity extends TabActivity {
 				// Done trying to discover bluetooth devices
 				Log.i(TAG, "Discovery finished!");
 				
-				HttpNodeClient httpNC = new HttpNodeClient(getSharedPreferences(MyHomeAudioActivity.PREFS_NAME, 0));
+				HttpNodeClient httpNC = new HttpNodeClient(getSharedPreferences(MHAApplication.PREFS_NAME, 0));
 				httpNC.sendRSSIValues(deviceList);
 				
 			}

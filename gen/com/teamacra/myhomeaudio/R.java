@@ -14,28 +14,43 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int defaultLabel=0x7f05000b;
-        public static final int defaultStream=0x7f05000c;
-        public static final int details=0x7f05000d;
-        public static final int finder=0x7f05000e;
-        public static final int header1=0x7f050006;
-        public static final int header2=0x7f05000a;
-        public static final int linearLayout1=0x7f050000;
-        public static final int mediaListView=0x7f050001;
-        public static final int nextButton=0x7f050004;
-        public static final int notice=0x7f050005;
-        public static final int playPauseButton=0x7f050003;
-        public static final int previousButton=0x7f050002;
-        public static final int turnOn=0x7f050007;
-        public static final int volLabel=0x7f050008;
-        public static final int volume=0x7f050009;
+        public static final int defaultLabel=0x7f050012;
+        public static final int defaultStream=0x7f050013;
+        public static final int details=0x7f05001a;
+        public static final int finder=0x7f05001b;
+        public static final int header1=0x7f05000d;
+        public static final int header2=0x7f050011;
+        public static final int linearLayout1=0x7f050007;
+        public static final int loginButton=0x7f050005;
+        public static final int loginTextView=0x7f050000;
+        public static final int mediaListView=0x7f050008;
+        public static final int newUserButton=0x7f050006;
+        public static final int nextButton=0x7f05000b;
+        public static final int notice=0x7f05000c;
+        public static final int passwordEditText=0x7f050004;
+        public static final int passwordTextView=0x7f050003;
+        public static final int playPauseButton=0x7f05000a;
+        public static final int previousButton=0x7f050009;
+        public static final int registerButton=0x7f050019;
+        public static final int registerPasswordEditText=0x7f050018;
+        public static final int registerPasswordTextView=0x7f050017;
+        public static final int registerTextView=0x7f050014;
+        public static final int registerUsernameEditText=0x7f050016;
+        public static final int registerUsernameTextView=0x7f050015;
+        public static final int turnOn=0x7f05000e;
+        public static final int usernameEditText=0x7f050002;
+        public static final int usernameTextView=0x7f050001;
+        public static final int volLabel=0x7f05000f;
+        public static final int volume=0x7f050010;
     }
     public static final class layout {
-        public static final int main=0x7f030000;
-        public static final int my=0x7f030001;
-        public static final int preferences=0x7f030002;
-        public static final int rooms=0x7f030003;
-        public static final int users=0x7f030004;
+        public static final int login=0x7f030000;
+        public static final int main=0x7f030001;
+        public static final int my=0x7f030002;
+        public static final int preferences=0x7f030003;
+        public static final int register=0x7f030004;
+        public static final int rooms=0x7f030005;
+        public static final int users=0x7f030006;
     }
     public static final class string {
         public static final int app_name=0x7f040001;

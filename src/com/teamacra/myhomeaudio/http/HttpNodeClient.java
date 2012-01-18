@@ -17,13 +17,10 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 
 
-public class HttpNodeClient {
-	private String host;
-	private String localIPAddress;
+public class HttpNodeClient extends HttpBase {
 	
 	public HttpNodeClient(SharedPreferences prefs) {
-		this.host = prefs.getString("host", "");
-		this.localIPAddress = prefs.getString("localIP", "");
+		super(prefs);
 	}
 	
 	public void sendRSSIValues(ArrayList<String> deviceList) {
