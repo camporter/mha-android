@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class LoginActivity extends Activity implements View.OnClickListener {
 
@@ -50,10 +51,16 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 			// Begin to log the user in if they press the button
 
 			String username = ((EditText) this.findViewById(R.id.usernameEditText)).getText()
-					.toString();
+					.toString().trim();
 			String password = ((EditText) this.findViewById(R.id.passwordEditText)).getText()
-					.toString();
-			new LogInUser().execute(username, password);
+					.toString().trim();
+			
+			if (username.length() > 0 && password.length() > 0)
+			{
+				new LogInUser().execute(username, password);
+			} else {
+				Toast.makeText(this, "Please fill in your username and password completely!", Toast.LENGTH_SHORT).show();
+			}
 		} else if (view == this.newUserButton) {
 			// Send the user to the RegisterActivity
 			Intent registerIntent = new Intent(this, RegisterActivity.class);
@@ -69,7 +76,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 	 * @author Cameron
 	 * 
 	 */
-	private class LogInUser extends AsyncTask<String, Void, Boolean> {
+	private class LogInUser extends AsyncTask<String, Void, String> {
 
 		private final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
 		private AlertDialog failureDialog;
@@ -79,25 +86,25 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 			this.progressDialog.show();
 		}
 
-		protected Boolean doInBackground(String... args) {
+		protected String doInBackground(String... args) {
 			String username = args[0];
 			String password = args[1];
 
 			// Do actual login here...
-			return true;
+			return "FAKESESSIONID";
 		}
 
-		protected void onPostExecute(final Boolean result) {
+		protected void onPostExecute(final String sessionId) {
 			MHAApplication app = (MHAApplication) LoginActivity.this.getApplication();
 			
-			if (result == true) {
+			if (sessionId != null) {
 				// Login successful, set our app variables
 				String username = ((EditText) LoginActivity.this
 						.findViewById(R.id.usernameEditText)).getText().toString();
 				String password = ((EditText) LoginActivity.this
 						.findViewById(R.id.passwordEditText)).getText().toString();
 				
-				app.setLoggedIn(username, password);
+				app.setLoggedIn(username, password, sessionId);
 				this.progressDialog.dismiss();
 			} else {
 				// Login failed, let the user know with an AlertDialog

@@ -1,12 +1,5 @@
 package com.teamacra.myhomeaudio.http;
 
-import java.io.IOException;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,9 +19,9 @@ public class HttpClient extends HttpBase {
 	 * @param ipAddress
 	 * @param macAddress
 	 * @param bluetoothName
-	 * @return The status code from the server indicating the result.
+	 * @return The sessionID for the user. Returns null if the login failed.
 	 */
-	public int login(String username, String password, String ipAddress, String macAddress,
+	public String login(String username, String password, String ipAddress, String macAddress,
 			String bluetoothName) {
 		JSONObject requestObject = new JSONObject();
 		try {
@@ -37,11 +30,12 @@ public class HttpClient extends HttpBase {
 			requestObject.put("ipaddress", ipAddress);
 			requestObject.put("macaddress", macAddress);
 			requestObject.put("bluetoothname", bluetoothName);
-			return executeSimplePostRequest("/client/login", requestObject);
+			JSONObject responseObject = executePostRequest("/client/login", requestObject);
+			return responseObject.getString("session");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return StatusCode.STATUS_FAILED;
+		return null;
 	}
 	
 	/**

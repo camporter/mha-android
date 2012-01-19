@@ -66,7 +66,7 @@ public class MyHomeAudioActivity extends TabActivity {
 		}
 		
 		// let the server know the client is ready
-		new HttpNodeClient(getSharedPreferences(MHAApplication.PREFS_NAME, 0)).sendStart();
+		//new HttpNodeClient(getSharedPreferences(MHAApplication.PREFS_NAME, 0)).sendStart();
 		
 		deviceList = new ArrayList<String>();
 		
