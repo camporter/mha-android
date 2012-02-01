@@ -12,12 +12,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.content.SharedPreferences;
+
+import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.StreamInterface;
 
 public class HttpStream extends HttpBase implements StreamInterface {
 	
-	public HttpStream(SharedPreferences prefs) {
-		super(prefs);
+	public HttpStream(MHAApplication app) {
+		super(app);
 	}
 	
 	public String[] getMediaList() {

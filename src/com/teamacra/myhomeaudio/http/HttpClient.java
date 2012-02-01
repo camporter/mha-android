@@ -3,12 +3,14 @@ package com.teamacra.myhomeaudio.http;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.teamacra.myhomeaudio.MHAApplication;
+
 import android.content.SharedPreferences;
 
 public class HttpClient extends HttpBase {
 
-	public HttpClient(SharedPreferences prefs) {
-		super(prefs);
+	public HttpClient(MHAApplication app) {
+		super(app);
 	}
 
 	/**
@@ -21,17 +23,18 @@ public class HttpClient extends HttpBase {
 	 * @param bluetoothName
 	 * @return The sessionID for the user. Returns null if the login failed.
 	 */
-	public String login(String username, String password, String ipAddress, String macAddress,
-			String bluetoothName) {
+	public String login(String username, String password) {
 		JSONObject requestObject = new JSONObject();
 		try {
 			requestObject.put("username", username);
 			requestObject.put("password", password);
-			requestObject.put("ipaddress", ipAddress);
+			requestObject.put("ipaddress", localIPAddress);
 			requestObject.put("macaddress", macAddress);
 			requestObject.put("bluetoothname", bluetoothName);
 			JSONObject responseObject = executePostRequest("/client/login", requestObject);
-			return responseObject.getString("session");
+			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
+				return responseObject.getString("session");
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

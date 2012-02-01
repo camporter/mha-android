@@ -1,9 +1,12 @@
-package com.teamacra.myhomeaudio;
+package com.teamacra.myhomeaudio.ui;
 
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.R;
+import com.teamacra.myhomeaudio.R.layout;
 import com.teamacra.myhomeaudio.bluetooth.DiscoveryService;
 import com.teamacra.myhomeaudio.http.HttpNodeClient;
 
@@ -37,11 +40,6 @@ public class MyHomeAudioActivity extends TabActivity {
 	public static final int MESSAGE_STATE_CHANGE = 1;
 	public static final int MESSAGE_READ = 2;
 	public static final int MESSAGE_DEVICE_NAME = 4;
-
-	// Intent request constants
-	private static final int REQUEST_ENABLE_BT = 3;
-
-	private BluetoothAdapter mBluetoothAdapter = null;
 	
 	private ArrayList<String> deviceList;
 	
@@ -54,9 +52,7 @@ public class MyHomeAudioActivity extends TabActivity {
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		checkConnectivity();
-
-		this.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		/*checkConnectivity();
 
 		if (mBluetoothAdapter == null) {
 			Toast.makeText(this, "Bluetooth is not available on this device.", Toast.LENGTH_SHORT)
@@ -74,7 +70,7 @@ public class MyHomeAudioActivity extends TabActivity {
 		registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
 		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
-		
+		*/
 		addTabs();
 	}
 
@@ -82,7 +78,7 @@ public class MyHomeAudioActivity extends TabActivity {
 		super.onStart();
 		Log.e(TAG, "++ ON START ++");
 
-		if (checkBluetooth()) {
+		/*if (checkBluetooth()) {
 			//this.startService(new Intent(this, DiscoveryService.class));
 			if (timer != null) {
 				
@@ -91,10 +87,10 @@ public class MyHomeAudioActivity extends TabActivity {
 				timer = new Timer("DiscoveryServiceTimer");
 				timer.schedule(updateTask, 0, 30*1000L);
 			}
-		}
+		}*/
 	}
 	
-	private TimerTask updateTask = new TimerTask() {
+	/*private TimerTask updateTask = new TimerTask() {
 		@Override
 		public void run() {
 			Log.i(TAG, "Trying to run discovery...");
@@ -105,43 +101,13 @@ public class MyHomeAudioActivity extends TabActivity {
 				Log.i(TAG, "Discovering: "+mBluetoothAdapter.isDiscovering());
 			}
 		}
-	};
-
-	/**
-	 * Checks if Bluetooth is on. Prompts user to turn it on if it is off.
-	 * 
-	 * @return Whether bluetooth is on or not.
-	 */
-	private boolean checkBluetooth() {
-		// Check if bluetooth is on, if not, turn it on
-		if (!mBluetoothAdapter.isEnabled()) {
-			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-			startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Checks if the phone's wifi is connected. We want the user to be on wifi,
-	 * not a mobile network, so that the phone can communicate with the server.
-	 */
-	private boolean wifiConnected() {
-		ConnectivityManager connectivityManager = (ConnectivityManager) this
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo networkInfo = null;
-		if (connectivityManager != null) {
-			networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-			System.out.println(networkInfo.isConnected());
-		}
-		return networkInfo == null ? false : networkInfo.isConnected();
-	}
+	};*/
 
 	/**
 	 * Displays a dialog to close the program if the user isn't on wifi. Doesn't
 	 * warn if the user is connected.
 	 */
-	private void checkConnectivity() {
+	/*private void checkConnectivity() {
 		if (!wifiConnected()) {
 			// Build a dialog box to inform user that wifi is not connected
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -158,13 +124,13 @@ public class MyHomeAudioActivity extends TabActivity {
 			AlertDialog alert = builder.create();
 			alert.show();
 		}
-	}
+	}*/
 
 	/**
 	 * Gets activity results and then handles them based off of their request
 	 * and result codes.
 	 */
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	/*public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 		case REQUEST_ENABLE_BT:
 			if (resultCode == Activity.RESULT_OK) {
@@ -178,7 +144,7 @@ public class MyHomeAudioActivity extends TabActivity {
 				finish();
 			}
 		}
-	}
+	}*/
 
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
@@ -215,7 +181,7 @@ public class MyHomeAudioActivity extends TabActivity {
 				// Done trying to discover bluetooth devices
 				Log.i(TAG, "Discovery finished!");
 				
-				HttpNodeClient httpNC = new HttpNodeClient(getSharedPreferences(MHAApplication.PREFS_NAME, 0));
+				HttpNodeClient httpNC = new HttpNodeClient((MHAApplication) MyHomeAudioActivity.this.getApplication());
 				httpNC.sendRSSIValues(deviceList);
 				
 			}

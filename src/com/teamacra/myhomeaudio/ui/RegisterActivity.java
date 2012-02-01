@@ -1,5 +1,8 @@
-package com.teamacra.myhomeaudio;
+package com.teamacra.myhomeaudio.ui;
 
+import com.teamacra.myhomeaudio.R;
+import com.teamacra.myhomeaudio.R.id;
+import com.teamacra.myhomeaudio.R.layout;
 import com.teamacra.myhomeaudio.http.StatusCode;
 
 import android.app.Activity;

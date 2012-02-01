@@ -7,9 +7,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.MyHomeAudioActivity;
 import com.teamacra.myhomeaudio.http.HttpNodeClient;
 import com.teamacra.myhomeaudio.http.HttpStream;
+import com.teamacra.myhomeaudio.ui.MyHomeAudioActivity;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -154,8 +154,8 @@ public class DiscoveryService extends Service {
 				// Done trying to discover bluetooth devices
 				Log.i(TAG, "Discovery finished!");
 				
-				HttpNodeClient httpNC = new HttpNodeClient(getSharedPreferences(MHAApplication.PREFS_NAME, 0));
-				httpNC.sendRSSIValues(deviceList);
+				//HttpNodeClient httpNC = new HttpNodeClient(getSharedPreferences(MHAApplication.PREFS_NAME, 0));
+				//httpNC.sendRSSIValues(deviceList);
 				
 			}
 			else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {

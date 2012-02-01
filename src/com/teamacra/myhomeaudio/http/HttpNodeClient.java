@@ -12,6 +12,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 
+import com.teamacra.myhomeaudio.MHAApplication;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
@@ -19,8 +21,8 @@ import android.net.wifi.WifiManager;
 
 public class HttpNodeClient extends HttpBase {
 	
-	public HttpNodeClient(SharedPreferences prefs) {
-		super(prefs);
+	public HttpNodeClient(MHAApplication app) {
+		super(app);
 	}
 	
 	public void sendRSSIValues(ArrayList<String> deviceList) {

@@ -7,6 +7,7 @@
     <ListView android:id="@+id/mediaListView" android:layout_width="match_parent" android:layout_height="370dp"></ListView>
     <LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:layout_height="fill_parent" android:weightSum="1">
         <Button android:text="Prev" android:id="@+id/previousButton" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+
         <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="Play" android:id="@+id/playPauseButton" android:layout_weight="0.86"></Button>
         <Button android:text="Next" android:id="@+id/nextButton" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
     </LinearLayout>

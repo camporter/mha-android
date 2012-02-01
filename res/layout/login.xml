@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="Login"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
     <TextView
         android:id="@+id/usernameTextView"
         android:layout_width="wrap_content"
@@ -20,7 +20,8 @@
     <EditText
         android:id="@+id/usernameEditText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content" >
+
         <requestFocus />
     </EditText>
 
@@ -35,13 +36,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="textPassword" />
-
+
+    <TextView
+        android:id="@+id/serverAddressTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Server Address" />
+
+    <EditText
+        android:id="@+id/serverAddressEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/loginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Login" />
-
+
     <Button
         android:id="@+id/newUserButton"
         android:layout_width="match_parent"

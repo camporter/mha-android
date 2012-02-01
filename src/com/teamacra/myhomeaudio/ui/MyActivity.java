@@ -1,4 +1,4 @@
-package com.teamacra.myhomeaudio;
+package com.teamacra.myhomeaudio.ui;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +12,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.R;
+import com.teamacra.myhomeaudio.R.id;
+import com.teamacra.myhomeaudio.R.layout;
 import com.teamacra.myhomeaudio.http.HttpStream;
 
 import android.app.Activity;
@@ -38,13 +42,13 @@ public class MyActivity extends Activity {
 		
 		ListView mediaListView = (ListView) findViewById(R.id.mediaListView);
 		
-		this.mediaArray = new HttpStream(sharedPreferences).getMediaList();
+		this.mediaArray = new HttpStream((MHAApplication) this.getApplication()).getMediaList();
 		
 		if(mediaArray != null) {
 			mediaListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mediaArray));
 			mediaListView.setOnItemClickListener(new OnItemClickListener() {
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					new HttpStream(sharedPreferences).play(((TextView)view).getText().toString());
+					new HttpStream((MHAApplication) MyActivity.this.getApplication()).play(((TextView)view).getText().toString());
 				}
 			});
 		}
