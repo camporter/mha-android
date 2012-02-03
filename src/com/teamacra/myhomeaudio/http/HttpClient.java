@@ -52,7 +52,7 @@ public class HttpClient extends HttpBase {
 		try {
 			requestObject.put("username", username);
 			requestObject.put("password", password);
-			return executeSimplePostRequest("/client/register", requestObject);
+			return executeSimplePostRequest("/user/register", requestObject);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

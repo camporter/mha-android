@@ -34,118 +34,21 @@ import android.widget.Toast;
 
 public class MyHomeAudioActivity extends TabActivity {
 
-	private static final String TAG = "MyHomeAudio";
-
-	// Constants defining the messages sent from the DiscoveryService handler
-	public static final int MESSAGE_STATE_CHANGE = 1;
-	public static final int MESSAGE_READ = 2;
-	public static final int MESSAGE_DEVICE_NAME = 4;
-	
-	private ArrayList<String> deviceList;
-	
-	private Timer timer;
-	private int mState;
-
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		/*checkConnectivity();
-
-		if (mBluetoothAdapter == null) {
-			Toast.makeText(this, "Bluetooth is not available on this device.", Toast.LENGTH_SHORT)
-					.show();
-			this.finish();
-			return;
-		}
 		
-		// let the server know the client is ready
-		//new HttpNodeClient(getSharedPreferences(MHAApplication.PREFS_NAME, 0)).sendStart();
-		
-		deviceList = new ArrayList<String>();
-		
-		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
-		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED));
-		registerReceiver(mReceiver, new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED));
-		*/
 		addTabs();
 	}
-
+	
 	public void onStart() {
 		super.onStart();
-		Log.e(TAG, "++ ON START ++");
-
-		/*if (checkBluetooth()) {
-			//this.startService(new Intent(this, DiscoveryService.class));
-			if (timer != null) {
-				
-			}
-			else {
-				timer = new Timer("DiscoveryServiceTimer");
-				timer.schedule(updateTask, 0, 30*1000L);
-			}
-		}*/
 	}
 	
-	/*private TimerTask updateTask = new TimerTask() {
-		@Override
-		public void run() {
-			Log.i(TAG, "Trying to run discovery...");
-			
-			if (!mBluetoothAdapter.isDiscovering()) {
-				Log.i(TAG, "Discovery isn't already running...");
-				mBluetoothAdapter.startDiscovery();
-				Log.i(TAG, "Discovering: "+mBluetoothAdapter.isDiscovering());
-			}
-		}
-	};*/
-
-	/**
-	 * Displays a dialog to close the program if the user isn't on wifi. Doesn't
-	 * warn if the user is connected.
-	 */
-	/*private void checkConnectivity() {
-		if (!wifiConnected()) {
-			// Build a dialog box to inform user that wifi is not connected
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage("You must be connected to WiFi before you can use My Home Audio");
-			builder.setCancelable(false);
-			builder.setPositiveButton("Quit", new DialogInterface.OnClickListener() {
-
-				public void onClick(DialogInterface dialog, int id) {
-					// End the app
-					MyHomeAudioActivity.this.finish();
-				}
-			});
-			// Show the dialog box
-			AlertDialog alert = builder.create();
-			alert.show();
-		}
-	}*/
-
-	/**
-	 * Gets activity results and then handles them based off of their request
-	 * and result codes.
-	 */
-	/*public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch (requestCode) {
-		case REQUEST_ENABLE_BT:
-			if (resultCode == Activity.RESULT_OK) {
-				// Bluetooth was enabled, great
-				//this.startService(new Intent(this, DiscoveryService.class));
-
-			} else {
-				// Didn't enable bluetooth! End the program
-				Toast.makeText(this, "Bluetooth must be available for My Home Audio to run.",
-						Toast.LENGTH_SHORT).show();
-				finish();
-			}
-		}
-	}*/
-
+	/*
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -191,6 +94,7 @@ public class MyHomeAudioActivity extends TabActivity {
 			
 		}
 	};
+	*/
 	
 	/**
 	 * Adds tabs to the main activity.

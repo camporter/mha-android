@@ -122,6 +122,10 @@ public class MHAApplication extends Application {
 		}
 	}
 	
+	public String getSessionId() {
+		return this.sessionId;
+	}
+	
 	/**
 	 * Gets the name of the device's bluetooth.
 	 * 

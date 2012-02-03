@@ -30,28 +30,32 @@ import android.widget.TextView;
 import android.view.View;
 
 public class MyActivity extends Activity {
-	
+
 	String[] mediaArray;
-	
-	public void onCreate(Bundle savedInstanceState)
-	{
-		final SharedPreferences sharedPreferences = getSharedPreferences(MHAApplication.PREFS_NAME, 0);
-		
+
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.my);
-		
+
 		ListView mediaListView = (ListView) findViewById(R.id.mediaListView);
-		
-		this.mediaArray = new HttpStream((MHAApplication) this.getApplication()).getMediaList();
-		
-		if(mediaArray != null) {
-			mediaListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mediaArray));
+		String sessionId = ((MHAApplication) this.getApplication()).getSessionId();
+		this.mediaArray = new HttpStream((MHAApplication) this.getApplication())
+				.getMediaList(sessionId);
+
+		if (mediaArray != null) {
+			mediaListView.setAdapter(new ArrayAdapter<String>(this,
+					android.R.layout.simple_list_item_1, mediaArray));
 			mediaListView.setOnItemClickListener(new OnItemClickListener() {
+
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					new HttpStream((MHAApplication) MyActivity.this.getApplication()).play(((TextView)view).getText().toString());
+					String sessionId = ((MHAApplication) MyActivity.this.getApplication())
+							.getSessionId();
+					String songName = ((TextView) view).getText().toString();
+					new HttpStream((MHAApplication) MyActivity.this.getApplication()).play(
+							sessionId, songName);
 				}
 			});
 		}
 	}
-	
+
 }
