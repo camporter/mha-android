@@ -1,10 +1,22 @@
 package com.teamacra.myhomeaudio.ui;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
 import com.teamacra.myhomeaudio.R.id;
 import com.teamacra.myhomeaudio.R.layout;
-import com.teamacra.myhomeaudio.discovery.Discovery;
+import com.teamacra.myhomeaudio.bluetooth.DiscoveryService;
+import com.teamacra.myhomeaudio.discovery.DiscoveryConstants;
+import com.teamacra.myhomeaudio.discovery.DiscoveryDescription;
+import com.teamacra.myhomeaudio.discovery.DiscoverySearch;
+import com.teamacra.myhomeaudio.discovery.DiscoverySearchMulti;
+import com.teamacra.myhomeaudio.discovery.DiscoverySearchListener;
 import com.teamacra.myhomeaudio.http.HttpClient;
 
 import android.app.Activity;
@@ -15,10 +27,12 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.MulticastLock;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,7 +54,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 		this.newUserButton = (Button) this.findViewById(R.id.newUserButton);
 		this.newUserButton.setOnClickListener(this);
 
-		this.serverAddressEditText = (EditText) this.findViewById(R.id.serverAddressEditText);
+		//this.serverAddressEditText = (EditText) this.findViewById(R.id.serverAddressEditText);
 
 	}
 
@@ -50,7 +64,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
 		checkBluetooth();
 
-		// new RunDiscovery().execute();
+		new RunDiscovery().execute();
 	}
 
 	/**
@@ -125,25 +139,44 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 	}
 
 	private class RunDiscovery extends AsyncTask<String, Void, String> {
-
-		private final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+		
+		private ProgressDialog progressDialog;
 		private AlertDialog failureDialog;
+		
+		private MulticastSocket socket;
+		private DatagramPacket receivedPacket;
 
 		protected void onPreExecute() {
-			this.progressDialog.setMessage("Finding the My Home Audio server...");
-			this.progressDialog.show();
+			progressDialog = new ProgressDialog(LoginActivity.this);
+			progressDialog.setMessage("Finding the My Home Audio server...");
+			progressDialog.show();
 		}
 
 		protected String doInBackground(String... args) {
+			Log.e("myhomeaudio", "doInBackground...");
 			// Lock multicast access over Wifi
 			WifiManager wifi = (WifiManager) LoginActivity.this
 					.getSystemService(android.content.Context.WIFI_SERVICE);
-			MulticastLock lock = wifi.createMulticastLock("MHADiscoveryLock");
+			/*MulticastLock lock = wifi.createMulticastLock("MHADiscoveryLock");
 			lock.setReferenceCounted(true);
-
-			Discovery discovery = new Discovery();
-			String serverAddress = discovery.run(lock);
-			return serverAddress;
+			lock.acquire();
+			
+			DiscoverySearchMulti discovery = new DiscoverySearchMulti();
+			discovery.setServiceName("myhomeaudio");
+			String result = discovery.run();
+			lock.release();
+			*/
+			DhcpInfo dhcp = wifi.getDhcpInfo();
+			try {
+				DiscoverySearch discovery = new DiscoverySearch(dhcp);
+				discovery.run();
+				Log.e("myhomeaudio", "Done!");
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+			
+			return null;
+			
 		}
 
 		protected void onPostExecute(final String serverAddress) {

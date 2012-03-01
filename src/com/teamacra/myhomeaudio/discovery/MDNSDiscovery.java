@@ -15,10 +15,10 @@ import android.net.wifi.WifiManager.MulticastLock;
 import android.util.Log;
 
 
-public class Discovery {
+public class MDNSDiscovery {
 	public static final String DISCOVERY_TYPE = "_myhomeaudio._tcp.local.";
 	
-	public Discovery() {
+	public MDNSDiscovery() {
 		
 	}
 	
