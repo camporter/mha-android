@@ -1,49 +1,39 @@
 package com.teamacra.myhomeaudio.ui;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-
-import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.R;
-import com.teamacra.myhomeaudio.R.id;
-import com.teamacra.myhomeaudio.R.layout;
-import com.teamacra.myhomeaudio.bluetooth.DiscoveryService;
-import com.teamacra.myhomeaudio.discovery.DiscoveryConstants;
-import com.teamacra.myhomeaudio.discovery.DiscoveryDescription;
-import com.teamacra.myhomeaudio.discovery.DiscoverySearch;
-import com.teamacra.myhomeaudio.discovery.DiscoverySearchMulti;
-import com.teamacra.myhomeaudio.discovery.DiscoverySearchListener;
-import com.teamacra.myhomeaudio.http.HttpClient;
-
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.MulticastLock;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class LoginActivity extends Activity implements View.OnClickListener {
+import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.R;
+import com.teamacra.myhomeaudio.discovery.DiscoverySearch;
+import com.teamacra.myhomeaudio.http.HttpClient;
+import com.teamacra.myhomeaudio.ui.actionbar.ActionBarActivity;
+
+public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
 
 	private Button loginButton;
 	private Button newUserButton;
 	private EditText serverAddressEditText;
 
+	/**
+	 * Creates the LoginActivity UI, sets up the click listener.
+	 */
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
@@ -53,14 +43,11 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 		this.loginButton.setOnClickListener(this);
 		this.newUserButton = (Button) this.findViewById(R.id.newUserButton);
 		this.newUserButton.setOnClickListener(this);
-
-		//this.serverAddressEditText = (EditText) this.findViewById(R.id.serverAddressEditText);
-
 	}
 
 	public void onStart() {
 		super.onStart();
-		MHAApplication app = (MHAApplication) this.getApplication();
+		this.getApplication();
 
 		checkBluetooth();
 
@@ -68,8 +55,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 	}
 
 	/**
-	 * Checks to see if a user is logged in. If they are, forward the user on to
-	 * the MyHomeAudioActivity instead.
+	 * Runs when the LoginActivity resumes. Checks to see if a user is logged
+	 * in. If they are, forward the user on to the MyHomeAudioActivity instead.
 	 * 
 	 * @param savedInstanceState
 	 */
@@ -92,28 +79,22 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 	@Override
 	public void onClick(View view) {
 
-		if (this.serverAddressEditText.length() < 7) {
-			Toast.makeText(this, "Please enter a valid server address.", Toast.LENGTH_SHORT).show();
-			return;
-		}
-
-		// Set the server to use
-		String server = ((EditText) this.serverAddressEditText).getText().toString().trim();
-		MHAApplication app = (MHAApplication) LoginActivity.this.getApplication();
-		app.setServerAddress(server);
-
 		if (view == this.loginButton) {
 			// Begin to log the user in if they press the button
 
-			String username = ((EditText) this.findViewById(R.id.usernameEditText)).getText()
-					.toString().trim();
-			String password = ((EditText) this.findViewById(R.id.passwordEditText)).getText()
-					.toString().trim();
+			String username = ((EditText) this
+					.findViewById(R.id.usernameEditText)).getText().toString()
+					.trim();
+			String password = ((EditText) this
+					.findViewById(R.id.passwordEditText)).getText().toString()
+					.trim();
 
 			if (username.length() > 0 && password.length() > 0) {
 				new LogInUser().execute(username, password);
 			} else {
-				Toast.makeText(this, "Please fill in your username and password completely!",
+				Toast.makeText(
+						this,
+						getText(R.string.complete_username_password),
 						Toast.LENGTH_SHORT).show();
 			}
 		} else if (view == this.newUserButton) {
@@ -122,16 +103,58 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 			this.startActivity(registerIntent);
 		}
 	}
+	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main, menu);
 
+        // Calling super after populating the menu is necessary here to ensure that the
+        // action bar helpers have a chance to handle this event.
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Toast.makeText(this, "Tapped home", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.menu_refresh:
+                Toast.makeText(this, "Fake refreshing...", Toast.LENGTH_SHORT).show();
+                getActionBarHelper().setRefreshActionItemState(true);
+                getWindow().getDecorView().postDelayed(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                getActionBarHelper().setRefreshActionItemState(false);
+                            }
+                        }, 1000);
+                break;
+
+            case R.id.menu_search:
+                Toast.makeText(this, "Tapped search", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.menu_share:
+                Toast.makeText(this, "Tapped share", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+	
 	/**
-	 * Checks if Bluetooth is on. Prompts user to turn it on if it is off.
+	 * Checks if Bluetooth is on. Prompts user to turn it on when off.
 	 * 
 	 * @return Whether bluetooth is on or not.
 	 */
 	private boolean checkBluetooth() {
-		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+				.getDefaultAdapter();
 		if (!bluetoothAdapter.isEnabled()) {
-			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			Intent enableBTIntent = new Intent(
+					BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableBTIntent, 3);
 			return false;
 		}
@@ -139,83 +162,83 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 	}
 
 	private class RunDiscovery extends AsyncTask<String, Void, String> {
-		
+
 		private ProgressDialog progressDialog;
 		private AlertDialog failureDialog;
-		
-		private MulticastSocket socket;
-		private DatagramPacket receivedPacket;
 
 		protected void onPreExecute() {
 			progressDialog = new ProgressDialog(LoginActivity.this);
-			progressDialog.setMessage("Finding the My Home Audio server...");
+			progressDialog.setMessage(getText(R.string.server_find));
 			progressDialog.show();
 		}
 
 		protected String doInBackground(String... args) {
-			Log.e("myhomeaudio", "doInBackground...");
-			// Lock multicast access over Wifi
+
 			WifiManager wifi = (WifiManager) LoginActivity.this
 					.getSystemService(android.content.Context.WIFI_SERVICE);
-			/*MulticastLock lock = wifi.createMulticastLock("MHADiscoveryLock");
-			lock.setReferenceCounted(true);
-			lock.acquire();
-			
-			DiscoverySearchMulti discovery = new DiscoverySearchMulti();
-			discovery.setServiceName("myhomeaudio");
-			String result = discovery.run();
-			lock.release();
-			*/
+
 			DhcpInfo dhcp = wifi.getDhcpInfo();
-			try {
-				DiscoverySearch discovery = new DiscoverySearch(dhcp);
-				discovery.run();
-				Log.e("myhomeaudio", "Done!");
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			}
-			
-			return null;
-			
+			DiscoverySearch discovery = new DiscoverySearch("myhomeaudio", dhcp);
+
+			String result = discovery.run();
+			discovery.end();
+			return result;
+
 		}
 
 		protected void onPostExecute(final String serverAddress) {
-			MHAApplication app = (MHAApplication) LoginActivity.this.getApplication();
+			MHAApplication app = (MHAApplication) LoginActivity.this
+					.getApplication();
 			if (serverAddress == null) {
 				// Didn't find the server, don't let the user continue
 				// Disable login button
 				loginButton.setEnabled(false);
 
 				// Show error dialog
-				AlertDialog.Builder failure = new AlertDialog.Builder(LoginActivity.this);
-				failure.setTitle("Server Not Found");
-				failure.setMessage("Unable to find the server.");
-				failure.setNegativeButton("Quit", new DialogInterface.OnClickListener() {
+				AlertDialog.Builder failure = new AlertDialog.Builder(
+						LoginActivity.this);
+				failure.setTitle(getText(R.string.server_find_failed_title));
+				failure.setMessage(getText(R.string.server_find_failed_detail));
+				failure.setNegativeButton(getText(R.string.quit),
+						new DialogInterface.OnClickListener() {
 
-					public void onClick(DialogInterface dialog, int which) {
-						// Close the activity
-						failureDialog.dismiss();
-						LoginActivity.this.finish();
-					}
-				});
-				failure.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// Close the activity
+								failureDialog.dismiss();
+								LoginActivity.this.finish();
+							}
+						});
+				/*
+				 * failure.setNeutralButton("Ok", new
+				 * DialogInterface.OnClickListener() {
+				 * 
+				 * public void onClick(DialogInterface dialog, int which) {
+				 * failureDialog.dismiss(); } });
+				 */
+				failure.setPositiveButton(getText(R.string.retry),
+						new DialogInterface.OnClickListener() {
 
-					public void onClick(DialogInterface dialog, int which) {
-						failureDialog.dismiss();
-					}
-				});
-				failure.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
-
-					public void onClick(DialogInterface dialog, int which) {
-						failureDialog.dismiss();
-						new RunDiscovery().execute();
-					}
-				});
+							public void onClick(DialogInterface dialog,
+									int which) {
+								// Run the discovery process again
+								failureDialog.dismiss();
+								new RunDiscovery().execute();
+							}
+						});
 
 				this.failureDialog = failure.create();
 				this.failureDialog.show();
 			} else {
+				// Found the server, save the address and let the user continue
+				app.setServerAddress(serverAddress);
 
+				// Update the address text view for debug purposes
+				TextView addrTextView = (TextView) LoginActivity.this
+						.findViewById(R.id.serverAddressTextView);
+				addrTextView.setText(getText(R.string.login_server_address) + " " + serverAddress);
+				// Enable the login button
+				LoginActivity.this.loginButton.setEnabled(true);
 			}
 			this.progressDialog.dismiss();
 		}
@@ -230,12 +253,14 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 	 */
 	private class LogInUser extends AsyncTask<String, Void, String> {
 
-		private final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+		private final ProgressDialog progressDialog = new ProgressDialog(
+				LoginActivity.this);
 		private AlertDialog failureDialog;
-		MHAApplication app = (MHAApplication) LoginActivity.this.getApplication();
+		MHAApplication app = (MHAApplication) LoginActivity.this
+				.getApplication();
 
 		protected void onPreExecute() {
-			this.progressDialog.setMessage("Logging you in...");
+			this.progressDialog.setMessage(getText(R.string.logging_in_wait));
 			this.progressDialog.show();
 		}
 
@@ -253,14 +278,17 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 			if (sessionId != null) {
 				// Login successful, set our app variables
 				String username = ((EditText) LoginActivity.this
-						.findViewById(R.id.usernameEditText)).getText().toString();
+						.findViewById(R.id.usernameEditText)).getText()
+						.toString();
 				String password = ((EditText) LoginActivity.this
-						.findViewById(R.id.passwordEditText)).getText().toString();
+						.findViewById(R.id.passwordEditText)).getText()
+						.toString();
 
 				app.setLoggedIn(username, password, sessionId);
 				this.progressDialog.dismiss();
-				
-				Intent mhaIntent = new Intent(LoginActivity.this, MyHomeAudioActivity.class);
+
+				Intent mhaIntent = new Intent(LoginActivity.this,
+						MyHomeAudioActivity.class);
 				LoginActivity.this.startActivity(mhaIntent);
 			} else {
 				// Login failed, let the user know with an AlertDialog
@@ -268,15 +296,18 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
 				app.setLoggedOut();
 
-				AlertDialog.Builder failure = new AlertDialog.Builder(LoginActivity.this);
-				failure.setTitle("Login Failed");
-				failure.setMessage("Check your username and password for errors.");
-				failure.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				AlertDialog.Builder failure = new AlertDialog.Builder(
+						LoginActivity.this);
+				failure.setTitle(getText(R.string.login_failed_title));
+				failure.setMessage(getText(R.string.login_failed_detail));
+				failure.setNeutralButton("Ok",
+						new DialogInterface.OnClickListener() {
 
-					public void onClick(DialogInterface dialog, int which) {
-						failureDialog.dismiss();
-					}
-				});
+							public void onClick(DialogInterface dialog,
+									int which) {
+								failureDialog.dismiss();
+							}
+						});
 
 				this.failureDialog = failure.create();
 				this.failureDialog.show();

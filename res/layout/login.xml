@@ -8,56 +8,59 @@
         android:id="@+id/loginTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
+        android:text="Welcome"
+        android:textAppearance="?android:attr/textAppearanceLarge">
+        <requestFocus />
+    </TextView>
+
     <TextView
         android:id="@+id/usernameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Username" />
-
+        android:layout_gravity="center_horizontal"
+        android:text="@string/Username" />
     <EditText
         android:id="@+id/usernameEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal" >
 
-        <requestFocus />
     </EditText>
-
+
     <TextView
         android:id="@+id/passwordTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Password" />
-
+        android:layout_gravity="center_horizontal"
+        android:text="@string/Password" />
+
     <EditText
         android:id="@+id/passwordEditText"
-        android:layout_width="match_parent"
+        android:layout_width="180dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:inputType="textPassword" />
-
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Login" />
+
+    <Button
+        android:id="@+id/newUserButton"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="New User" />
+
     <TextView
         android:id="@+id/serverAddressTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Server Address" />
-
-    <EditText
-        android:id="@+id/serverAddressEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Login" />
-
-    <Button
-        android:id="@+id/newUserButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="New User" />
+        android:layout_gravity="center_horizontal"
+        android:text="Server Address: 0.0.0.0" 
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>

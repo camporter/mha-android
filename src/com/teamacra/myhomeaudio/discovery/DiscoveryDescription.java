@@ -11,25 +11,14 @@ public class DiscoveryDescription implements Comparable<DiscoveryDescription> {
 	private String instanceName;
 	private int clientPort;
 	private int nodePort;
-	private InetAddress address;
 
-	public DiscoveryDescription(String instanceName, int clientPort, int nodePort,
-			InetAddress address) {
+	public DiscoveryDescription(String instanceName, int clientPort, int nodePort) {
 		this.instanceName = instanceName;
 		this.clientPort = clientPort;
 		this.nodePort = nodePort;
-		this.address = address;
 	}
 
 	public DiscoveryDescription() {
-	}
-
-	public InetAddress getAddress() {
-		return address;
-	}
-
-	public void setAddress(InetAddress serviceAddress) {
-		this.address = serviceAddress;
 	}
 
 	public String getInstanceName() {
@@ -41,7 +30,7 @@ public class DiscoveryDescription implements Comparable<DiscoveryDescription> {
 	}
 
 	/**
-	 * Makes the string URl encoded, which makes it easier to deal with in
+	 * Makes the string URL encoded, which makes it easier to deal with in
 	 * transit.
 	 * 
 	 * @return
@@ -90,8 +79,6 @@ public class DiscoveryDescription implements Comparable<DiscoveryDescription> {
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		buf.append(getEncodedInstanceName());
-		buf.append(" ");
-		buf.append(getAddress().getHostAddress());
 		buf.append(" ");
 		buf.append(Integer.toString(clientPort));
 		buf.append(" ");
@@ -142,10 +129,12 @@ public class DiscoveryDescription implements Comparable<DiscoveryDescription> {
 	 *         the given strings.
 	 * @see DiscoveryDescription#toString()
 	 */
-	public static DiscoveryDescription parse(String encodedInstanceName, String addressAsString,
+	public static DiscoveryDescription parse(String encodedInstanceName,
 			String clientPortAsString, String nodePortAsString) {
 
 		DiscoveryDescription descriptor = new DiscoveryDescription();
+		
+		// Put the instance name
 		try {
 			String name = URLDecoder.decode(encodedInstanceName, "UTF-8");
 			if (name == null || name.length() == 0) {
@@ -157,15 +146,7 @@ public class DiscoveryDescription implements Comparable<DiscoveryDescription> {
 			return null;
 		}
 
-		try {
-			InetAddress addr = InetAddress.getByName(addressAsString);
-			descriptor.setAddress(addr);
-		} catch (UnknownHostException uhe) {
-			System.err.println("Unexpected exception: " + uhe);
-			uhe.printStackTrace();
-			return null;
-		}
-
+		// Put the client and node ports
 		try {
 			int p = Integer.parseInt(clientPortAsString);
 			descriptor.setClientPort(p);
