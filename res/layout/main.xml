@@ -1,14 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TabHost xmlns:android="http://schemas.android.com/apk/res/android" android:id="@android:id/tabhost" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
-    <LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical">
-        <TabWidget  android:layout_width="match_parent" 
-        			android:layout_height="wrap_content" 
-        			android:id="@android:id/tabs">
-    	</TabWidget>
-    	
-        <FrameLayout android:layout_width="match_parent" 
-        			 android:layout_height="match_parent" 
-        			 android:id="@android:id/tabcontent">
-     	</FrameLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:weightSum="1" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="0.84" >
+        </android.support.v4.view.ViewPager>
+        
+        <LinearLayout
+            android:id="@+id/gridLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.05"
+            android:orientation="horizontal" >
+
+            <ImageButton
+                android:id="@+id/previousButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.07"
+                android:src="@drawable/ic_action_previous" 
+                android:background="@android:color/transparent" />
+
+            <ImageButton
+                android:id="@+id/playPauseButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.11"
+                android:src="@drawable/ic_action_play" 
+                android:background="@android:color/transparent" />
+
+            <ImageButton
+                android:id="@+id/nextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.07"
+                android:src="@drawable/ic_action_next" 
+                android:background="@android:color/transparent" />
+
+        </LinearLayout>
     </LinearLayout>
-</TabHost>
+
+</LinearLayout>

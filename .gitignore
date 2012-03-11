@@ -1,3 +1,4 @@
 #ignore the bin directory
 bin/
 doc/
+gen/

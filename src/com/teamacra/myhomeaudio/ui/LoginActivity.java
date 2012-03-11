@@ -6,36 +6,36 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources.Theme;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockActivity;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
 import com.teamacra.myhomeaudio.discovery.DiscoverySearch;
 import com.teamacra.myhomeaudio.http.HttpClient;
-import com.teamacra.myhomeaudio.ui.actionbar.ActionBarActivity;
 
-public class LoginActivity extends ActionBarActivity implements View.OnClickListener {
+public class LoginActivity extends SherlockActivity implements View.OnClickListener {
 
 	private Button loginButton;
 	private Button newUserButton;
-	private EditText serverAddressEditText;
 
 	/**
 	 * Creates the LoginActivity UI, sets up the click listener.
 	 */
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
+		setTheme(R.style.Theme_Sherlock);
 		setContentView(R.layout.login);
 
 		// Register the click listeners for the buttons
@@ -103,46 +103,6 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 			this.startActivity(registerIntent);
 		}
 	}
-	
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.main, menu);
-
-        // Calling super after populating the menu is necessary here to ensure that the
-        // action bar helpers have a chance to handle this event.
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Toast.makeText(this, "Tapped home", Toast.LENGTH_SHORT).show();
-                break;
-
-            case R.id.menu_refresh:
-                Toast.makeText(this, "Fake refreshing...", Toast.LENGTH_SHORT).show();
-                getActionBarHelper().setRefreshActionItemState(true);
-                getWindow().getDecorView().postDelayed(
-                        new Runnable() {
-                            @Override
-                            public void run() {
-                                getActionBarHelper().setRefreshActionItemState(false);
-                            }
-                        }, 1000);
-                break;
-
-            case R.id.menu_search:
-                Toast.makeText(this, "Tapped search", Toast.LENGTH_SHORT).show();
-                break;
-
-            case R.id.menu_share:
-                Toast.makeText(this, "Tapped share", Toast.LENGTH_SHORT).show();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 	
 	/**
 	 * Checks if Bluetooth is on. Prompts user to turn it on when off.
