@@ -177,8 +177,8 @@ public final class DiscoverySearch {
 
 		StringTokenizer tokens = new StringTokenizer(
 				dataStr.substring(15 + getEncodedServiceName().length()));
-		if (tokens.countTokens() == 3) {
-			return DiscoveryDescription.parse(tokens.nextToken(),
+		if (tokens.countTokens() == 4) {
+			return DiscoveryDescription.parse(tokens.nextToken(), tokens.nextToken(),
 					tokens.nextToken(), tokens.nextToken());
 		} else {
 			return null;

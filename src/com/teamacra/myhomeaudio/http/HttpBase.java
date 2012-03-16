@@ -28,24 +28,17 @@ import android.content.SharedPreferences;
  */
 public class HttpBase {
 
-	protected String host;
-	protected int port;
-	protected String localIPAddress;
-	protected String macAddress;
-	protected String bluetoothName;
+	protected MHAApplication app;
+	
 	protected HttpClient httpClient;
 	protected HttpParams httpParams;
 
 	public HttpBase(MHAApplication app) {
-		this.host = app.getServerAddress();
-		this.port = app.getPort();
-		this.localIPAddress = app.getLocalAddress();
-		this.macAddress = app.getMacAddress();
-		this.bluetoothName = app.getBluetoothName();
+		this.app = app;
 		
 		this.httpParams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParams, 5000); // Default timeout is 5 seconds
-		HttpConnectionParams.setSoTimeout(httpParams, 10000); // Default socket timeout is 10 seconds
+		HttpConnectionParams.setConnectionTimeout(httpParams, 3000); // Default timeout is 5 seconds
+		HttpConnectionParams.setSoTimeout(httpParams, 7000); // Default socket timeout is 10 seconds
 		
 		this.httpClient = new DefaultHttpClient(httpParams);
 	}
@@ -63,7 +56,7 @@ public class HttpBase {
 	 */
 	protected JSONObject executePostRequest(String apiUrl, JSONObject jsonRequestData) {
 		try {
-			HttpPost httpPost = new HttpPost("http://" + host + ":" + String.valueOf(port) + apiUrl);
+			HttpPost httpPost = new HttpPost("http://" + app.getServerAddress() + ":" + String.valueOf(app.getPort()) + apiUrl);
 			
 			httpPost.setEntity(new StringEntity(jsonRequestData.toString()));
 			ResponseHandler<String> responseHandler = new BasicResponseHandler();

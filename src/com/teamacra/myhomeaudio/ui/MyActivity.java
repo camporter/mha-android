@@ -39,7 +39,7 @@ public class MyActivity extends Activity {
 
 		ListView mediaListView = (ListView) findViewById(R.id.mediaListView);
 		String sessionId = ((MHAApplication) this.getApplication()).getSessionId();
-		this.mediaArray = new HttpStream((MHAApplication) this.getApplication())
+		/*this.mediaArray = new HttpStream((MHAApplication) this.getApplication())
 				.getMediaList(sessionId);
 
 		if (mediaArray != null) {
@@ -55,7 +55,7 @@ public class MyActivity extends Activity {
 							sessionId, songName);
 				}
 			});
-		}
+		}*/
 	}
 
 }

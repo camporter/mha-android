@@ -1,18 +1,15 @@
 package com.teamacra.myhomeaudio.ui;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources.Theme;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -273,6 +270,6 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 				this.failureDialog.show();
 			}
 		}
-
 	}
+	
 }
