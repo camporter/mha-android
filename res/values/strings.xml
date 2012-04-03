@@ -15,6 +15,7 @@
     <string name="cancel">Cancel</string>
     <string name="quit">Quit</string>
     <string name="login_server_address">Server Address:</string>
+    <string name="add_stream">Add Stream</string>
     <string name="alternate_title">An alternate title that is long</string>
     <string name="toggle_title">Toggle title</string>
 

@@ -7,7 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.http.HttpNodeClient;
+import com.teamacra.myhomeaudio.http.HttpNode;
 import com.teamacra.myhomeaudio.http.HttpStream;
 import com.teamacra.myhomeaudio.ui.MyHomeAudioActivity;
 

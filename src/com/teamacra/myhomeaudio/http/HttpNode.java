@@ -22,23 +22,22 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 
 
-public class HttpNodeClient extends HttpBase {
+public class HttpNode extends HttpBase {
 	
-	public HttpNodeClient(MHAApplication app) {
+	public HttpNode(MHAApplication app) {
 		super(app);
 	}
 	
 	/**
 	 * Sends a request for the list of nodes on the server.
 	 * 
-	 * @param sessionId Session ID assigned to the client.
 	 * @return An ArrayList of the Nodes. Returns null if the request failed.
 	 */
-	public ArrayList<Node> getNodes(String sessionId) {
+	public ArrayList<Node> getNodes() {
 		JSONObject requestObject = new JSONObject();
 		
 		try {
-			requestObject.put("session", sessionId);
+			requestObject.put("session", app.getSessionId());
 			JSONObject responseObject = executePostRequest("/node/list", requestObject);
 			
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
@@ -47,7 +46,7 @@ public class HttpNodeClient extends HttpBase {
 				
 				for (int i=0; i < responseArray.length(); i++) {
 					JSONObject node = responseArray.getJSONObject(i);
-					Node newNode = new Node(node.getInt("id"), node.getString("name"));
+					Node newNode = new Node(node.getInt("id"), node.getString("name"), "");
 					resultArray.add(newNode);
 				}
 				
@@ -62,7 +61,7 @@ public class HttpNodeClient extends HttpBase {
 	public void sendRSSIValues(ArrayList<String> deviceList) {
 		
 		try {
-			String url = this.host+"/client/rssi";
+			String url = "http://"+app.getServerAddress()+":"+app.getPort()+"/client/rssi";
 			System.out.println("Sending RSSI values to server");
 			HttpPost httpPost = new HttpPost(url);
 			

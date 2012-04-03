@@ -1,10 +1,13 @@
 package com.teamacra.myhomeaudio.http;
 
+import java.util.ArrayList;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.stream.Stream;
 
 public class HttpStream extends HttpBase {
 	
@@ -40,8 +43,13 @@ public class HttpStream extends HttpBase {
 
 	}
 	
-	public String[] getStreamList() {
-		String[] result = new String[0];
+	/**
+	 * Send a request to the server for the list of streams.
+	 * 
+	 * @return Returns a list of Stream objects.
+	 */
+	public ArrayList<Stream> getStreamList() {
+		ArrayList<Stream> result = new ArrayList<Stream>();
 		
 		JSONObject requestObject = new JSONObject();
 		try {
@@ -50,15 +58,16 @@ public class HttpStream extends HttpBase {
 			
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK && responseObject.has("streams")) {
 				JSONArray streamArray = responseObject.getJSONArray("streams");
-				result = new String[streamArray.length()];
 				for (int i = 0; i < streamArray.length(); i++) {
-					result[i] = streamArray.getString(i);
+					JSONObject next = streamArray.getJSONObject(i);
+					result.add(new Stream(next.getInt("id"), next.getString("name")));
 				}
+				return result;
 			}
 		} catch(JSONException e) {
 			e.printStackTrace();
 		}
-		return result;
+		return null;
 	}
 	
 	public boolean addStream(String streamName) {

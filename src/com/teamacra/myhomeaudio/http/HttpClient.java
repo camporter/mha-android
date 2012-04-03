@@ -18,9 +18,6 @@ public class HttpClient extends HttpBase {
 	 * 
 	 * @param username
 	 * @param password
-	 * @param ipAddress
-	 * @param macAddress
-	 * @param bluetoothName
 	 * @return The sessionID for the user. Returns null if the login failed.
 	 */
 	public String login(String username, String password) {
@@ -28,9 +25,9 @@ public class HttpClient extends HttpBase {
 		try {
 			requestObject.put("username", username);
 			requestObject.put("password", password);
-			requestObject.put("ipaddress", localIPAddress);
-			requestObject.put("macaddress", macAddress);
-			requestObject.put("bluetoothname", bluetoothName);
+			requestObject.put("ipaddress", app.getLocalAddress());
+			requestObject.put("macaddress", app.getMacAddress());
+			requestObject.put("bluetoothname", app.getBluetoothName());
 			JSONObject responseObject = executePostRequest("/client/login", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
 				return responseObject.getString("session");

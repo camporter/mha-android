@@ -220,7 +220,7 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 			this.progressDialog.setMessage(getText(R.string.logging_in_wait));
 			this.progressDialog.show();
 		}
-
+		
 		protected String doInBackground(String... args) {
 			String username = args[0];
 			String password = args[1];
