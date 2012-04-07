@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.teamacra.myhomeaudio.MHAApplication;
@@ -15,6 +16,9 @@ import com.teamacra.myhomeaudio.http.HttpStream;
 import com.teamacra.myhomeaudio.manager.NodeManager;
 import com.teamacra.myhomeaudio.manager.StreamManager;
 import com.teamacra.myhomeaudio.stream.Stream;
+import com.viewpagerindicator.PageIndicator;
+import com.viewpagerindicator.TabPageIndicator;
+import com.viewpagerindicator.TitleProvider;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -38,10 +42,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MyHomeAudioActivity extends SherlockActivity implements
+public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		OnNavigationListener {
 	
-	private MainPagerAdapter mAdapter;
+	private TabAdapter mAdapter;
 
 	// Add Stream properties
 	private EditText mAddStreamEditText;
@@ -54,6 +58,8 @@ public class MyHomeAudioActivity extends SherlockActivity implements
 	// Node stuff
 	private ArrayList<Node> mNodeList;
 	private ArrayAdapter<Node> mNodeAdapter;
+	
+	private static final String[] CONTENT = new String[] { "Test", "Test 2", "Test 3", "Test 4" };
 
 	/** Called when the activity is first created. */
 	@Override
@@ -67,7 +73,8 @@ public class MyHomeAudioActivity extends SherlockActivity implements
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setTheme(R.style.Theme_Sherlock);
 		setContentView(R.layout.main);
-
+		
+		// Setup the action bar
 		Context context = getSupportActionBar().getThemedContext();
 		mStreamAdapter = new ArrayAdapter<Stream>(context,
 				R.layout.sherlock_spinner_item, mStreamList);
@@ -76,7 +83,14 @@ public class MyHomeAudioActivity extends SherlockActivity implements
 
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(mStreamAdapter, this);
-
+		
+		// Setup the tabpages
+		mAdapter = new TabAdapter(getSupportFragmentManager());
+		ViewPager mPager = (ViewPager)findViewById(R.id.tabPager);
+		mPager.setAdapter(mAdapter);
+		PageIndicator mIndicator = (TabPageIndicator)findViewById(R.id.tabIndicator);
+		mIndicator.setViewPager(mPager);
+		
 		// Setup the add stream dialog
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getText(R.string.add_stream));
@@ -258,4 +272,27 @@ public class MyHomeAudioActivity extends SherlockActivity implements
 			}
 		}
 	}
+	
+	private class TabAdapter extends TestFragmentAdapter implements TitleProvider {
+		public TabAdapter(FragmentManager fm) {
+			super(fm);
+		}
+		
+		@Override
+		public Fragment getItem(int position) {
+			return TestFragment.newInstance(MyHomeAudioActivity.CONTENT[position]);
+		}
+		
+		@Override
+		public int getCount() {
+			return MyHomeAudioActivity.CONTENT.length;
+		}
+		
+		@Override
+		public String getTitle(int position) {
+			return MyHomeAudioActivity.CONTENT[position % MyHomeAudioActivity.CONTENT.length].toUpperCase();
+		}
+	}
 }
+
+
