@@ -29,4 +29,8 @@ public class Node {
 	public String bluetoothaddress() {
 		return bluetoothaddress;
 	}
+	
+	public String toString() {
+		return name;
+	}
 }

@@ -39,6 +39,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +47,9 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		OnNavigationListener {
 	
 	private TabAdapter mAdapter;
-
+	
+	private ViewPager mPager;
+	
 	// Add Stream properties
 	private EditText mAddStreamEditText;
 	private AlertDialog mAddStreamDialog;
@@ -58,6 +61,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	// Node stuff
 	private ArrayList<Node> mNodeList;
 	private ArrayAdapter<Node> mNodeAdapter;
+	private ListView mNodeListView;
 	
 	private static final String[] CONTENT = new String[] { "Test", "Test 2", "Test 3", "Test 4" };
 
@@ -66,7 +70,6 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	public void onCreate(Bundle savedInstanceState) {
 		MHAApplication app = (MHAApplication) getApplication();
 
-		mStreamList = new ArrayList<Stream>();
 		new UpdateStreams().execute("");
 
 		super.onCreate(savedInstanceState);
@@ -76,6 +79,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		
 		// Setup the action bar
 		Context context = getSupportActionBar().getThemedContext();
+		mStreamList = new ArrayList<Stream>();
 		mStreamAdapter = new ArrayAdapter<Stream>(context,
 				R.layout.sherlock_spinner_item, mStreamList);
 		mStreamAdapter
@@ -84,9 +88,17 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(mStreamAdapter, this);
 		
+		// Setup the node list
+		mNodeList = new ArrayList<Node>();
+		mNodeList.add(new Node(0, "FOLLOW ME", "rargh"));
+		mNodeAdapter = new ArrayAdapter<Node>(context, android.R.layout.simple_list_item_multiple_choice, mNodeList);
+		mNodeListView = (ListView) findViewById(R.id.nodeListView);
+		mNodeListView.setAdapter(mNodeAdapter);
+		mNodeListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+		
 		// Setup the tabpages
 		mAdapter = new TabAdapter(getSupportFragmentManager());
-		ViewPager mPager = (ViewPager)findViewById(R.id.tabPager);
+		mPager = (ViewPager)findViewById(R.id.tabPager);
 		mPager.setAdapter(mAdapter);
 		PageIndicator mIndicator = (TabPageIndicator)findViewById(R.id.tabIndicator);
 		mIndicator.setViewPager(mPager);

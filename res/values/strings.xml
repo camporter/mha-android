@@ -4,13 +4,13 @@
     <string name="Username">Username</string>
     <string name="Password">Password</string>
     <string name="complete_username_password">Please fill in your username and password completely!</string>
-    <string name="server_find">Finding the My Home Audio server#8230;</string>
+    <string name="server_find">Finding the My Home Audio server...</string>
     <string name="server_find_failed_detail">Unable to find the server!</string>
     <string name="server_find_failed_title">Server Not Found</string>
-    <string name="logging_in_wait">Logging you in#8230;</string>
+    <string name="logging_in_wait">Logging you in...</string>
     <string name="login_failed_title">Login Failed</string>
     <string name="login_failed_detail">Check your username and password for errors.</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="retry">Retry</string>
     <string name="cancel">Cancel</string>
     <string name="quit">Quit</string>
