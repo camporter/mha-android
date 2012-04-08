@@ -15,7 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.Node;
+import com.teamacra.myhomeaudio.node.Node;
 
 import android.content.Context;
 import android.content.SharedPreferences;

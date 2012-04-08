@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.Node;
 import com.teamacra.myhomeaudio.http.HttpNode;
+import com.teamacra.myhomeaudio.node.Node;
 
 public class NodeManager {
 	private ArrayList<Node> nodeList;

@@ -7,10 +7,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.node.Node;
 import com.teamacra.myhomeaudio.stream.Stream;
 
 public class HttpStream extends HttpBase {
-	
+
 	public HttpStream(MHAApplication app) {
 		super(app);
 	}
@@ -42,7 +43,7 @@ public class HttpStream extends HttpBase {
 		return result;
 
 	}
-	
+
 	/**
 	 * Send a request to the server for the list of streams.
 	 * 
@@ -50,13 +51,14 @@ public class HttpStream extends HttpBase {
 	 */
 	public ArrayList<Stream> getStreamList() {
 		ArrayList<Stream> result = new ArrayList<Stream>();
-		
+
 		JSONObject requestObject = new JSONObject();
 		try {
 			requestObject.put("session", app.getSessionId());
 			JSONObject responseObject = executePostRequest("/stream/list", requestObject);
-			
-			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK && responseObject.has("streams")) {
+
+			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK
+					&& responseObject.has("streams")) {
 				JSONArray streamArray = responseObject.getJSONArray("streams");
 				for (int i = 0; i < streamArray.length(); i++) {
 					JSONObject next = streamArray.getJSONObject(i);
@@ -64,12 +66,12 @@ public class HttpStream extends HttpBase {
 				}
 				return result;
 			}
-		} catch(JSONException e) {
+		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	public boolean addStream(String streamName) {
 		JSONObject requestObject = new JSONObject();
 		JSONObject streamObject = new JSONObject();
@@ -77,7 +79,7 @@ public class HttpStream extends HttpBase {
 			requestObject.put("session", app.getSessionId());
 			streamObject.put("name", streamName);
 			requestObject.put("stream", streamObject);
-			
+
 			JSONObject responseObject = executePostRequest("/stream/add", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
 				return true;
@@ -112,6 +114,23 @@ public class HttpStream extends HttpBase {
 				return true;
 			}
 
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean assignNodes(Stream stream, ArrayList<Node> nodes) {
+		JSONObject requestObject = new JSONObject();
+		
+		try {
+			requestObject.put("session", app.getSessionId());
+			requestObject.put("stream", stream.toJSONObject());
+			
+			JSONObject responseObject = executePostRequest("/stream/assign", requestObject);
+			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
+				return true;
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

@@ -1,9 +1,14 @@
 package com.teamacra.myhomeaudio.stream;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
-import com.teamacra.myhomeaudio.Node;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.teamacra.myhomeaudio.node.Node;
 
 public class Stream {
 	private int id;
@@ -13,6 +18,7 @@ public class Stream {
 	public Stream(int id, String name) {
 		this.id = id;
 		this.name = name;
+		this.assignedNodes = new ArrayList<Node>();
 	}
 	
 	public Stream(Stream stream) {
@@ -35,5 +41,26 @@ public class Stream {
 	
 	public ArrayList<Node> getAssignedNodes() {
 		return new ArrayList<Node>(assignedNodes);
+	}
+	
+	public void setAssignedNodes(ArrayList<Node> newAssignedNodes) {
+		this.assignedNodes.clear();
+		this.assignedNodes.addAll(newAssignedNodes);
+	}
+	
+	public JSONObject toJSONObject() {
+		JSONObject result = new JSONObject();
+		
+		try {
+			result.put("id", id);
+			result.put("name", name);
+			
+			result.put("assignedNodes", new JSONArray(assignedNodes));
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 }

@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.http.HttpStream;
+import com.teamacra.myhomeaudio.node.Node;
 import com.teamacra.myhomeaudio.stream.Stream;
 
 public class StreamManager {
@@ -95,4 +96,21 @@ public class StreamManager {
 		}
 		return false;
 	}
+	
+	/**
+	 * Assigns new nodes to the stream on the server.
+	 * @param streamId
+	 * @param nodes
+	 * @return
+	 */
+	public boolean assignNodes(int streamId, ArrayList<Node> nodes) {
+		Stream stream = getStream(streamId);
+		
+		if (stream != null && httpStream.assignNodes(stream, nodes)) {
+			return true;
+		}
+		return false;
+	}
 }
+
+

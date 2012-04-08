@@ -1,4 +1,4 @@
-package com.teamacra.myhomeaudio;
+package com.teamacra.myhomeaudio.node;
 
 
 public class Node {
