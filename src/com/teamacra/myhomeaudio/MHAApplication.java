@@ -24,6 +24,7 @@ public class MHAApplication extends Application {
 	public static final String PREFS_NAME = "MyHomeAudioPrefs";
 
 	private boolean isLoggedIn;
+	private boolean isInitialConfig;
 	private String username;
 	private String password;
 	private String sessionId;
@@ -38,6 +39,7 @@ public class MHAApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		this.isLoggedIn = false;
+		this.isInitialConfig = false;
 
 		/*SharedPreferences sharedPrefs = this.getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor prefsEditor = sharedPrefs.edit();
