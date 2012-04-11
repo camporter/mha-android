@@ -1,5 +1,7 @@
 package com.teamacra.myhomeaudio.http;
 
+import java.util.Arrays;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,10 +20,12 @@ public class HttpClient extends HttpBase {
 	 * 
 	 * @param username
 	 * @param password
-	 * @return The sessionID for the user and initialConfig status. Returns null if the login failed.
+	 * @return First element - The sessionID for the user, Second element - The initialConfig status.
+	 * 		Returns an array with each element set to null if the login failed.
 	 */
 	public String[] login(String username, String password) {
 		JSONObject requestObject = new JSONObject();
+		String[] responseData = {null,null};
 		try {
 			requestObject.put("username", username);
 			requestObject.put("password", password);
@@ -30,14 +34,14 @@ public class HttpClient extends HttpBase {
 			requestObject.put("bluetoothname", app.getBluetoothName());
 			JSONObject responseObject = executePostRequest("/client/login", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
-				String[] responseData = {responseObject.getString("session"),
-							responseObject.getString("initialConfig")};
-				return responseData;
+				responseData[0] = responseObject.getString("session");
+				responseData[1] = responseObject.getString("initialConfig");
 			}	
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return null;
+		System.out.println("Response:" + Arrays.toString(responseData));
+		return responseData;
 	}
 	
 	/**
