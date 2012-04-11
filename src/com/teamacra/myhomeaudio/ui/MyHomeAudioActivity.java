@@ -49,7 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnNavigationListener {
-
+	
 	private TabAdapter mAdapter;
 
 	private ViewPager mPager;
@@ -156,7 +156,8 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, 1, 0, getText(R.string.add_stream)).setShowAsAction(
 				MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		menu.add(0, 2, 0, "Logout").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		menu.add(0, 2, 0, "Reconfigure").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		menu.add(0, 3, 0, "Logout").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		return true;
 	}
 
@@ -166,7 +167,12 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 			// Show the add stream dialog
 			mAddStreamDialog.show();
 			return true;
+			
 		} else if (item.getItemId() == 2) {
+			Intent startConfigIntent = new Intent(this, InitialConfigActivity.class);
+			this.startActivity(startConfigIntent);
+			
+		} else if (item.getItemId() == 3) {
 			// Log the user out
 
 			Toast.makeText(this, "logout", Toast.LENGTH_SHORT).show();
