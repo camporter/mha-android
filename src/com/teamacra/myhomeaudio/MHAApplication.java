@@ -24,7 +24,7 @@ public class MHAApplication extends Application {
 	public static final String PREFS_NAME = "MyHomeAudioPrefs";
 
 	private boolean isLoggedIn;
-	private boolean isInitialConfig;
+	private boolean isConfigured;
 	private String username;
 	private String password;
 	private String sessionId;
@@ -39,7 +39,7 @@ public class MHAApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		this.isLoggedIn = false;
-		this.isInitialConfig = false;
+		this.isConfigured = false;
 
 		/*SharedPreferences sharedPrefs = this.getSharedPreferences(PREFS_NAME, 0);
 		SharedPreferences.Editor prefsEditor = sharedPrefs.edit();
@@ -65,14 +65,14 @@ public class MHAApplication extends Application {
 	 * @param username Username for the user logged in.
 	 * @param password Password for the user logged in.
 	 * @param sessionId Session assigned to the client for the user.
-	 * @param initialConfig Configuration status for the user
+	 * @param configured Configuration status for the user
 	 */
-	public void setLoggedIn(String username, String password, String sessionId, boolean initialConfig) {
+	public void setLoggedIn(String username, String password, String sessionId, boolean configured) {
 		this.username = username;
 		this.password = password;
 		this.sessionId = sessionId;
 		this.isLoggedIn = true;
-		this.isInitialConfig = initialConfig;
+		this.isConfigured = configured;
 	}
 	
 	/**
@@ -80,6 +80,7 @@ public class MHAApplication extends Application {
 	 */
 	public void setLoggedOut() {
 		this.isLoggedIn = false;
+		this.isConfigured = false;
 		this.username = null;
 		this.password = null;
 		this.sessionId = null;
@@ -91,6 +92,10 @@ public class MHAApplication extends Application {
 	 */
 	public boolean isLoggedIn() {
 		return this.isLoggedIn;
+	}
+	
+	public boolean isConfigured(){
+		return this.isConfigured;
 	}
 	
 	public void setServerAddress(String serverAddress) {

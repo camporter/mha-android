@@ -61,11 +61,15 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 		super.onResume();
 
 		MHAApplication app = (MHAApplication) this.getApplication();
+		Intent intent = null;
 
 		// Check to make sure the user is not already logged in
-		if (app.isLoggedIn()) {
+		if (app.isLoggedIn() && app.isConfigured()) {
 			// User logged in, so forward them on past the login
-			Intent intent = new Intent(this, MyHomeAudioActivity.class);
+			intent = new Intent(this, MyHomeAudioActivity.class);
+			this.startActivity(intent);
+		}else if (app.isLoggedIn()){
+			intent = new Intent(this, InitialConfigActivity.class);
 			this.startActivity(intent);
 		}
 
@@ -232,7 +236,7 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 
 		protected void onPostExecute(final String[] result) {
 			final String sessionId = result[0];
-			final boolean initialConfig = Boolean.parseBoolean(result[1]);
+			final boolean configured = Boolean.parseBoolean(result[1]);
 			
 			if (sessionId != null) {
 				// Login successful, set our app variables
@@ -243,11 +247,18 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 						.findViewById(R.id.passwordEditText)).getText()
 						.toString();
 
-				app.setLoggedIn(username, password, sessionId, initialConfig);
+				app.setLoggedIn(username, password, sessionId, configured);
 				this.progressDialog.dismiss();
-
-				Intent mhaIntent = new Intent(LoginActivity.this,
-						MyHomeAudioActivity.class);
+				
+				Intent mhaIntent;
+				if(app.isConfigured()){
+					mhaIntent = new Intent(LoginActivity.this,
+							MyHomeAudioActivity.class);
+				}else{
+					mhaIntent = new Intent(LoginActivity.this,
+							InitialConfigActivity.class);
+				}
+				
 				LoginActivity.this.startActivity(mhaIntent);
 			} else {
 				// Login failed, let the user know with an AlertDialog

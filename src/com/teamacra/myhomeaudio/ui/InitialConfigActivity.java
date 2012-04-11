@@ -1,5 +1,6 @@
 package com.teamacra.myhomeaudio.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -48,6 +49,22 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 		ft.add(R.id.initialconfig_fragment, welcomeFragment).commit();
 		
+	}
+	
+	public void onResume() {
+		super.onResume();
+
+		MHAApplication app = (MHAApplication) this.getApplication();
+
+		// Check to make sure the user is not already logged in
+		if (app.isConfigured()) {
+			// User logged in, so forward them on past the login
+			Intent intent = new Intent(this, MyHomeAudioActivity.class);
+			this.startActivity(intent);
+		}
+
+		// Check wifi, update the server connection status
+
 	}
 	
 	@Override

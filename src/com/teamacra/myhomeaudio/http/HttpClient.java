@@ -20,7 +20,7 @@ public class HttpClient extends HttpBase {
 	 * 
 	 * @param username
 	 * @param password
-	 * @return First element - The sessionID for the user, Second element - The initialConfig status.
+	 * @return First element - The sessionID for the user, Second element - The configured status.
 	 * 		Returns an array with each element set to null if the login failed.
 	 */
 	public String[] login(String username, String password) {
@@ -35,7 +35,7 @@ public class HttpClient extends HttpBase {
 			JSONObject responseObject = executePostRequest("/client/login", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
 				responseData[0] = responseObject.getString("session");
-				responseData[1] = responseObject.getString("initialConfig");
+				responseData[1] = responseObject.getString("configured");
 			}	
 		} catch (JSONException e) {
 			e.printStackTrace();
