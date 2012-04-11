@@ -208,7 +208,7 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 	 * @author Cameron
 	 * 
 	 */
-	private class LogInUser extends AsyncTask<String, Void, String> {
+	private class LogInUser extends AsyncTask<String, Void, String[]> {
 
 		private final ProgressDialog progressDialog = new ProgressDialog(
 				LoginActivity.this);
@@ -221,7 +221,7 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 			this.progressDialog.show();
 		}
 		
-		protected String doInBackground(String... args) {
+		protected String[] doInBackground(String... args) {
 			String username = args[0];
 			String password = args[1];
 
@@ -230,8 +230,10 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 			return client.login(username, password);
 		}
 
-		protected void onPostExecute(final String sessionId) {
-
+		protected void onPostExecute(final String[] result) {
+			final String sessionId = result[0];
+			final boolean initialConfig = Boolean.parseBoolean(result[1]);
+			
 			if (sessionId != null) {
 				// Login successful, set our app variables
 				String username = ((EditText) LoginActivity.this
@@ -241,7 +243,7 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 						.findViewById(R.id.passwordEditText)).getText()
 						.toString();
 
-				app.setLoggedIn(username, password, sessionId);
+				app.setLoggedIn(username, password, sessionId, initialConfig);
 				this.progressDialog.dismiss();
 
 				Intent mhaIntent = new Intent(LoginActivity.this,

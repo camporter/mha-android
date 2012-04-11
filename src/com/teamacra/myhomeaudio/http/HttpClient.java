@@ -18,9 +18,9 @@ public class HttpClient extends HttpBase {
 	 * 
 	 * @param username
 	 * @param password
-	 * @return The sessionID for the user. Returns null if the login failed.
+	 * @return The sessionID for the user and initialConfig status. Returns null if the login failed.
 	 */
-	public String login(String username, String password) {
+	public String[] login(String username, String password) {
 		JSONObject requestObject = new JSONObject();
 		try {
 			requestObject.put("username", username);
@@ -30,8 +30,10 @@ public class HttpClient extends HttpBase {
 			requestObject.put("bluetoothname", app.getBluetoothName());
 			JSONObject responseObject = executePostRequest("/client/login", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
-				return responseObject.getString("session");
-			}
+				String[] responseData = {responseObject.getString("session"),
+							responseObject.getString("initialConfig")};
+				return responseData;
+			}	
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

@@ -65,12 +65,14 @@ public class MHAApplication extends Application {
 	 * @param username Username for the user logged in.
 	 * @param password Password for the user logged in.
 	 * @param sessionId Session assigned to the client for the user.
+	 * @param initialConfig Configuration status for the user
 	 */
-	public void setLoggedIn(String username, String password, String sessionId) {
+	public void setLoggedIn(String username, String password, String sessionId, boolean initialConfig) {
 		this.username = username;
 		this.password = password;
 		this.sessionId = sessionId;
 		this.isLoggedIn = true;
+		this.isInitialConfig = initialConfig;
 	}
 	
 	/**
