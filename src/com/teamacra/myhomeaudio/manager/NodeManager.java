@@ -41,6 +41,7 @@ public class NodeManager {
 	}
 	
 	public synchronized boolean updateConfiguration(ArrayList<Node> newConfiguration) {
+		return false;
 		
 	}
 
@@ -53,6 +54,11 @@ public class NodeManager {
 	 */
 	public ArrayList<Node> getNodeList() {
 		return new ArrayList<Node>(nodeList);
+	}
+	
+	
+	public ArrayList<Node> getActiveNodeList(){
+		return httpNode.getActiveNodes();
 	}
 
 	/**

@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.app.SherlockListActivity;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
 import com.teamacra.myhomeaudio.manager.NodeManager;
@@ -39,6 +40,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 	
 	private Button mNextButton;
 	private Button mCancelButton;
+	private Button mRefreshButton;
 	private TextView mTitleText;
 	private TextView mDescriptionText;
 
@@ -63,6 +65,15 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			}
 		});
 		
+		mRefreshButton = (Button) findViewById(R.id.initialconfig_refreshButton);
+		mRefreshButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new UpdateNodes().execute();
+			}
+		});
+		mRefreshButton.setVisibility(View.GONE);
+		
 		mCancelButton = (Button) findViewById(R.id.initialconfig_cancelButton);
 		mCancelButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -73,6 +84,8 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		
 		mTitleText = (TextView) findViewById(R.id.initialconfig_header);
 		mDescriptionText = (TextView) findViewById(R.id.initialconfig_description);
+		
+		
 
 		if (savedInstanceState == null) {
 			//Fragment welcomeFragment = WelcomeFragment.newInstance();
@@ -105,16 +118,36 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		savedInstanceState.putBoolean("welcomeComplete", this.welcomeComplete);
 		//savedInstanceState.putBoolean("confirmNodesComplete", this.confirmNodesComplete);
 	}
+	
+	protected void onListItemClick(ListView l, View v, int position, long id){
+		
+		Log.d("MyHomeAudio", "ListItemClick");
+	}
 
 	@Override
 	public void onBackPressed() {
 
 	}
+	
+	//1. get nodelist fro mdb on server
+	//2. detect nodes 
+	void updateNodeList(){
+		final MHAApplication app = (MHAApplication) getApplication();
+		NodeManager nm = NodeManager.getInstance(app);
+		nm.updateNodes();
+		mNodeList.clear();
+		mNodeList.addAll(nm.getActiveNodeList());
+		mNodeAdapter.notifyDataSetChanged();
+	}
 
 	void changeFragment() {
+		
 		if (!welcomeComplete) {
 			// Just pressed next on the welcome screen
 			welcomeComplete = true;
+
+			//Allow the refresh button to be visible
+			mRefreshButton.setVisibility(View.VISIBLE);
 			
 			// We need to get from the server the nodes that are available
 			new UpdateNodes().execute();
