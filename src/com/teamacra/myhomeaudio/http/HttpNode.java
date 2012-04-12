@@ -89,4 +89,14 @@ public class HttpNode extends HttpBase {
 			e.printStackTrace();
 		}
 	}
+
+	public int updateConfiguration(ArrayList<Node> newConfiguration) {
+		JSONObject requestObject = new JSONObject();
+		try {
+			requestObject.put("nodes", "");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return StatusCode.STATUS_FAILED;
+	}
 }
