@@ -39,6 +39,10 @@ public class NodeManager {
 		}
 		return false;
 	}
+	
+	public synchronized boolean updateConfiguration(ArrayList<Node> newConfiguration) {
+		
+	}
 
 	/**
 	 * Gets a list of Node objects.
