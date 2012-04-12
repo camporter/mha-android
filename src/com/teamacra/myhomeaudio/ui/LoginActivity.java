@@ -25,12 +25,14 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 
 	private Button loginButton;
 	private Button newUserButton;
+	
+	private Bundle intentBundle;
 
 	/**
 	 * Creates the LoginActivity UI, sets up the click listener.
 	 */
 	public void onCreate(Bundle savedInstanceState) {
-		
+
 		super.onCreate(savedInstanceState);
 		setTheme(R.style.Theme_Sherlock);
 		setContentView(R.layout.login);
@@ -40,14 +42,15 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 		this.loginButton.setOnClickListener(this);
 		this.newUserButton = (Button) this.findViewById(R.id.newUserButton);
 		this.newUserButton.setOnClickListener(this);
+		
+		intentBundle = getIntent().getExtras();
 	}
 
 	public void onStart() {
 		super.onStart();
-		this.getApplication();
 
 		checkBluetooth();
-
+		
 		new RunDiscovery().execute();
 	}
 
@@ -61,16 +64,26 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 		super.onResume();
 
 		MHAApplication app = (MHAApplication) this.getApplication();
-		Intent intent = null;
 
-		// Check to make sure the user is not already logged in
+		// Check to make sure the user is not already logged in and/or configured
 		if (app.isLoggedIn() && app.isConfigured()) {
-			// User logged in, so forward them on past the login
-			intent = new Intent(this, MyHomeAudioActivity.class);
-			this.startActivity(intent);
-		}else if (app.isLoggedIn()){
-			intent = new Intent(this, InitialConfigActivity.class);
-			this.startActivity(intent);
+			// Logged in and configured
+			startActivity(new Intent(this, MyHomeAudioActivity.class));
+			
+		} else if (app.isLoggedIn()) {
+			// Logged in but not configured
+			Bundle extras = getIntent().getExtras();
+			
+			if (extras != null && extras.getBoolean("finish")) {
+				// Tells the activity that we should finish, ending the program
+				finish();
+				return;
+			}
+			
+			startActivity(new Intent(this, InitialConfigActivity.class));
+			
+		} else {
+			// Not logged in
 		}
 
 		// Check wifi, update the server connection status
@@ -83,19 +96,15 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 		if (view == this.loginButton) {
 			// Begin to log the user in if they press the button
 
-			String username = ((EditText) this
-					.findViewById(R.id.usernameEditText)).getText().toString()
-					.trim();
-			String password = ((EditText) this
-					.findViewById(R.id.passwordEditText)).getText().toString()
-					.trim();
+			String username = ((EditText) this.findViewById(R.id.usernameEditText)).getText()
+					.toString().trim();
+			String password = ((EditText) this.findViewById(R.id.passwordEditText)).getText()
+					.toString().trim();
 
 			if (username.length() > 0 && password.length() > 0) {
 				new LogInUser().execute(username, password);
 			} else {
-				Toast.makeText(
-						this,
-						getText(R.string.complete_username_password),
+				Toast.makeText(this, getText(R.string.complete_username_password),
 						Toast.LENGTH_SHORT).show();
 			}
 		} else if (view == this.newUserButton) {
@@ -104,18 +113,16 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 			this.startActivity(registerIntent);
 		}
 	}
-	
+
 	/**
 	 * Checks if Bluetooth is on. Prompts user to turn it on when off.
 	 * 
 	 * @return Whether bluetooth is on or not.
 	 */
 	private boolean checkBluetooth() {
-		BluetoothAdapter bluetoothAdapter = BluetoothAdapter
-				.getDefaultAdapter();
+		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (!bluetoothAdapter.isEnabled()) {
-			Intent enableBTIntent = new Intent(
-					BluetoothAdapter.ACTION_REQUEST_ENABLE);
+			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableBTIntent, 3);
 			return false;
 		}
@@ -148,23 +155,20 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 		}
 
 		protected void onPostExecute(final String serverAddress) {
-			MHAApplication app = (MHAApplication) LoginActivity.this
-					.getApplication();
+			MHAApplication app = (MHAApplication) LoginActivity.this.getApplication();
 			if (serverAddress == null) {
 				// Didn't find the server, don't let the user continue
 				// Disable login button
 				loginButton.setEnabled(false);
 
 				// Show error dialog
-				AlertDialog.Builder failure = new AlertDialog.Builder(
-						LoginActivity.this);
+				AlertDialog.Builder failure = new AlertDialog.Builder(LoginActivity.this);
 				failure.setTitle(getText(R.string.server_find_failed_title));
 				failure.setMessage(getText(R.string.server_find_failed_detail));
 				failure.setNegativeButton(getText(R.string.quit),
 						new DialogInterface.OnClickListener() {
 
-							public void onClick(DialogInterface dialog,
-									int which) {
+							public void onClick(DialogInterface dialog, int which) {
 								// Close the activity
 								failureDialog.dismiss();
 								LoginActivity.this.finish();
@@ -180,8 +184,7 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 				failure.setPositiveButton(getText(R.string.retry),
 						new DialogInterface.OnClickListener() {
 
-							public void onClick(DialogInterface dialog,
-									int which) {
+							public void onClick(DialogInterface dialog, int which) {
 								// Run the discovery process again
 								failureDialog.dismiss();
 								new RunDiscovery().execute();
@@ -214,17 +217,15 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 	 */
 	private class LogInUser extends AsyncTask<String, Void, String[]> {
 
-		private final ProgressDialog progressDialog = new ProgressDialog(
-				LoginActivity.this);
+		private final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
 		private AlertDialog failureDialog;
-		MHAApplication app = (MHAApplication) LoginActivity.this
-				.getApplication();
+		MHAApplication app = (MHAApplication) LoginActivity.this.getApplication();
 
 		protected void onPreExecute() {
 			this.progressDialog.setMessage(getText(R.string.logging_in_wait));
 			this.progressDialog.show();
 		}
-		
+
 		protected String[] doInBackground(String... args) {
 			String username = args[0];
 			String password = args[1];
@@ -237,28 +238,24 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 		protected void onPostExecute(final String[] result) {
 			final String sessionId = result[0];
 			final boolean configured = Boolean.parseBoolean(result[1]);
-			
+
 			if (sessionId != null) {
 				// Login successful, set our app variables
 				String username = ((EditText) LoginActivity.this
-						.findViewById(R.id.usernameEditText)).getText()
-						.toString();
+						.findViewById(R.id.usernameEditText)).getText().toString();
 				String password = ((EditText) LoginActivity.this
-						.findViewById(R.id.passwordEditText)).getText()
-						.toString();
+						.findViewById(R.id.passwordEditText)).getText().toString();
 
 				app.setLoggedIn(username, password, sessionId, configured);
 				this.progressDialog.dismiss();
-				
+
 				Intent mhaIntent;
-				if(app.isConfigured()){
-					mhaIntent = new Intent(LoginActivity.this,
-							MyHomeAudioActivity.class);
-				}else{
-					mhaIntent = new Intent(LoginActivity.this,
-							InitialConfigActivity.class);
+				if (app.isConfigured()) {
+					mhaIntent = new Intent(LoginActivity.this, MyHomeAudioActivity.class);
+				} else {
+					mhaIntent = new Intent(LoginActivity.this, InitialConfigActivity.class);
 				}
-				
+
 				LoginActivity.this.startActivity(mhaIntent);
 			} else {
 				// Login failed, let the user know with an AlertDialog
@@ -266,23 +263,20 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 
 				app.setLoggedOut();
 
-				AlertDialog.Builder failure = new AlertDialog.Builder(
-						LoginActivity.this);
+				AlertDialog.Builder failure = new AlertDialog.Builder(LoginActivity.this);
 				failure.setTitle(getText(R.string.login_failed_title));
 				failure.setMessage(getText(R.string.login_failed_detail));
-				failure.setNeutralButton("Ok",
-						new DialogInterface.OnClickListener() {
+				failure.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
 
-							public void onClick(DialogInterface dialog,
-									int which) {
-								failureDialog.dismiss();
-							}
-						});
+					public void onClick(DialogInterface dialog, int which) {
+						failureDialog.dismiss();
+					}
+				});
 
 				this.failureDialog = failure.create();
 				this.failureDialog.show();
 			}
 		}
 	}
-	
+
 }
