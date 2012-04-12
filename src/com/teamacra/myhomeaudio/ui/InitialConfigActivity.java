@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
@@ -19,6 +22,8 @@ import com.teamacra.myhomeaudio.R;
 
 public class InitialConfigActivity extends SherlockFragmentActivity {
 	
+	private Button nextButton;
+	private Button cancelButton;
 	private boolean welcomeComplete = false;
 	
 	@Override
@@ -29,15 +34,15 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		setTheme(R.style.Theme_Sherlock);
 		setContentView(R.layout.initialconfig);
 		
-		Button button = (Button) findViewById(R.id.initialconfig_nextButton);
-		button.setOnClickListener(new OnClickListener() {
+		nextButton = (Button) findViewById(R.id.initialconfig_nextButton);
+		nextButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				changeFragment();
 			}
 		});
 		
-		Button cancelButton = (Button) findViewById(R.id.initialconfig_cancelButton);
+		cancelButton = (Button) findViewById(R.id.initialconfig_cancelButton);
 		cancelButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -56,15 +61,26 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 
 		MHAApplication app = (MHAApplication) this.getApplication();
 
-		// Check to make sure the user is not already logged in
+		// Check to make sure the user is not already configured
 		if (app.isConfigured()) {
-			// User logged in, so forward them on past the login
+			// User already configured, move past configuration
 			Intent intent = new Intent(this, MyHomeAudioActivity.class);
 			this.startActivity(intent);
 		}
-
-		// Check wifi, update the server connection status
-
+	}
+	
+	public void onClick(View view){
+		Log.d("MyHomeAudio", "Button Clicked");
+		if (view == this.nextButton) {
+			//User pressed next button
+			Log.d("MyHomeAudio", "Next Button Clicked");
+			
+		} else if (view == this.cancelButton) {
+			//User pressed cancel, exit to login?
+			Intent intent = new Intent(this, LoginActivity.class);
+			this.startActivity(intent);
+		}
+		
 	}
 	
 	@Override
@@ -81,6 +97,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			ft.replace(R.id.initialconfig_fragment, nodeFragment);
 			ft.addToBackStack(null);
 			ft.commit();
+			Log.d("MyHomeAudio", "Welcome Frag Complete");
 		}
 	}
 	
