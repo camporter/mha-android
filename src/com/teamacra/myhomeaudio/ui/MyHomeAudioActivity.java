@@ -174,8 +174,8 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 			
 		} else if (item.getItemId() == 3) {
 			// Log the user out
-
-			Toast.makeText(this, "logout", Toast.LENGTH_SHORT).show();
+			((MHAApplication) getApplication()).setLoggedOut();
+			finish();
 			return true;
 		}
 		return false;
