@@ -31,6 +31,8 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 	private ArrayAdapter<Node> mNodeAdapter;
 	private ArrayAdapter<NodeSignalRange> mNodeSignalAdapter;
 	
+	AsyncTask<Integer, Void, Void>  nodeConfig;
+	
 	private Button mNextButton;
 	private Button mCancelButton;
 	private Button mRefreshButton;
@@ -67,6 +69,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		mRefreshButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				Log.d(TAG, "Refresh Clicked");
 				new UpdateNodes().execute();
 			}
 		});
@@ -84,7 +87,8 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		mStartButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
+				nodeConfig = new NodeConfig();
+				nodeConfig.execute();
 			}
 		});
 		mStartButton.setVisibility(View.GONE);
@@ -93,7 +97,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		mStopButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
+				nodeConfig.cancel(true);
 			}
 		});
 		mStopButton.setVisibility(View.GONE);
@@ -247,6 +251,42 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		protected void onPostExecute() {
 			progressDialog.dismiss();
 		}
+		
+	}
+	
+	protected class NodeConfig extends AsyncTask<Integer, Void, Void> {
+		MHAApplication app = (MHAApplication) InitialConfigActivity.this.getApplication();
+		
+		protected void onPreExecute() {
+			mStartButton.setVisibility(View.INVISIBLE);
+			mStopButton.setVisibility(View.VISIBLE);
+			Log.d(TAG,"NodeConfig Started");
+		}
+		
+		protected Void doInBackground(Integer... params) {
+			NodeManager nm = NodeManager.getInstance(app);
+			int i = 0;
+			while(!isCancelled()){
+				i++;
+				if(i == 100000){
+					Log.d(TAG, "NodeConfig Running");
+					i = 0;
+				}
+			}
+			Log.d(TAG, "NodeConfig Cancelled");
+			return null;
+		}
+		
+		protected void onPostExecute() {
+			Log.d(TAG,"NodeConfig Ended");
+		}
+		
+		protected void onCancelled(){
+			
+		}
+
+
+
 		
 	}
 }
