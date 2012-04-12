@@ -1,32 +1,24 @@
 package com.teamacra.myhomeaudio.ui;
 
-import android.content.Intent;
 import java.util.ArrayList;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.app.SherlockListActivity;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
+import com.teamacra.myhomeaudio.locations.NodeSignalRange;
 import com.teamacra.myhomeaudio.manager.NodeManager;
 import com.teamacra.myhomeaudio.node.Node;
 
@@ -37,12 +29,18 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 
 	private ArrayList<Node> mNodeList;
 	private ArrayAdapter<Node> mNodeAdapter;
+	private ArrayAdapter<NodeSignalRange> mNodeSignalAdapter;
 	
 	private Button mNextButton;
 	private Button mCancelButton;
 	private Button mRefreshButton;
+	private Button mStartButton;
+	private Button mStopButton;
+	
 	private TextView mTitleText;
 	private TextView mDescriptionText;
+	
+	private final String TAG = "MyHomeAudio";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -82,6 +80,25 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			}
 		});
 		
+		mStartButton = (Button) findViewById(R.id.initialconfig_startButton);
+		mStartButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+			}
+		});
+		mStartButton.setVisibility(View.GONE);
+		
+		mStopButton = (Button) findViewById(R.id.initialconfig_stopButton);
+		mStopButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				
+			}
+		});
+		mStopButton.setVisibility(View.GONE);
+		
+		
 		mTitleText = (TextView) findViewById(R.id.initialconfig_header);
 		mDescriptionText = (TextView) findViewById(R.id.initialconfig_description);
 		
@@ -118,11 +135,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		savedInstanceState.putBoolean("welcomeComplete", this.welcomeComplete);
 		//savedInstanceState.putBoolean("confirmNodesComplete", this.confirmNodesComplete);
 	}
-	
-	protected void onListItemClick(ListView l, View v, int position, long id){
-		
-		Log.d("MyHomeAudio", "ListItemClick");
-	}
+
 
 	@Override
 	public void onBackPressed() {
@@ -142,6 +155,8 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 
 	void changeFragment() {
 		
+		Log.d("MyHomeAudio", "ListSize:"+mNodeList.size());
+		
 		if (!welcomeComplete) {
 			// Just pressed next on the welcome screen
 			welcomeComplete = true;
@@ -150,12 +165,31 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			mRefreshButton.setVisibility(View.VISIBLE);
 			
 			// We need to get from the server the nodes that are available
+			Log.d(TAG, "Starting Initial Update NodeList");
 			new UpdateNodes().execute();
 
+		} else if (nextNodeIndex == 0){
+			Log.d(TAG, "Changing Visibility of Buttons");
+			mStartButton.setVisibility(View.VISIBLE);
+			mNextButton.setVisibility(View.INVISIBLE);
+			mRefreshButton.setVisibility(View.INVISIBLE);
+		
+			mNodeSignalAdapter = new ArrayAdapter<NodeSignalRange>(this, android.R.layout.simple_list_item_1, 
+					new ArrayList<NodeSignalRange>());
+			ListView nodeListView = (ListView) findViewById(R.id.initialconfig_nodeList);
+			nodeListView.setAdapter(mNodeSignalAdapter);
+			
+			mTitleText.setText("Node #" + nextNodeIndex + " " + mNodeList.get(nextNodeIndex).name());
+			mDescriptionText.setText("For initializing the node, press start and begin walking the far reaches.");
+			
+			
+			
 		} else if (nextNodeIndex < mNodeList.size()) {
 			// Do individual Node scans
+			mTitleText.setText("Node #" + nextNodeIndex + " " + mNodeList.get(nextNodeIndex).name());
+			mDescriptionText.setText("For initializing the node, press start and begin walking the far reaches.");
 			
-			Toast.makeText(InitialConfigActivity.this, "#"+nextNodeIndex, Toast.LENGTH_SHORT).show();
+			//Toast.makeText(InitialConfigActivity.this, "#"+(nextNodeIndex+1), Toast.LENGTH_SHORT).show();
 			
 			nextNodeIndex++;
 		} else {		
