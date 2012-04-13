@@ -33,6 +33,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 
 	private ArrayList<Node> mNodeList;
 	private ArrayAdapter<Node> mNodeAdapter;
+	private ArrayList<NodeSignalRange> mNodeSignalList;
 	private ArrayAdapter<NodeSignalRange> mNodeSignalAdapter;
 	
 	AsyncTask<Integer, ArrayList<NodeSignalRange>, Void>  nodeConfig;
@@ -47,7 +48,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 	private TextView mTitleText;
 	private TextView mDescriptionText;
 
-	private final String TAG = "MyHomeAudio";
+	private final String TAG ="InitialConfigActivity";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -163,15 +164,6 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 
 	}
 
-	void updateNodeList(){
-		final MHAApplication app = (MHAApplication) getApplication();
-		NodeManager nm = NodeManager.getInstance(app);
-		nm.updateNodes();
-		mNodeList.clear();
-		mNodeList.addAll(nm.getActiveNodeList());
-		mNodeAdapter.notifyDataSetChanged();
-	}
-
 	/**
 	 * Handles switching the state of the activity given the current state.
 	 * Usually after the next button is pressed.
@@ -190,25 +182,25 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			// We need to get from the server the nodes that are available
 			Log.d(TAG, "Starting Initial Update NodeList");
 			new UpdateNodes().execute();
-
-		} else if (nextNodeIndex < mNodeList.size()) {
+			
+		}else if (nextNodeIndex < mNodeList.size()) {
 			// Change button visibility
+			Log.d(TAG, "Changing Visibility of Buttons");
 			mStartButton.setVisibility(View.VISIBLE);
 			mNextButton.setVisibility(View.INVISIBLE);
 			mRefreshButton.setVisibility(View.GONE);
 		
+			mNodeSignalList = new ArrayList<NodeSignalRange>();
 			mNodeSignalAdapter = new ArrayAdapter<NodeSignalRange>(this, android.R.layout.simple_list_item_1, 
-					new ArrayList<NodeSignalRange>());
+					mNodeSignalList);
 			ListView nodeListView = (ListView) findViewById(R.id.initialconfig_nodeList);
 			nodeListView.setAdapter(mNodeSignalAdapter);
 			
 			// Do individual Node scans
-			mTitleText
-					.setText("Node #" + nextNodeIndex + " " + mNodeList.get(nextNodeIndex).name());
-			mDescriptionText
-					.setText("For initializing the node, press start and begin walking the far reaches.");
+			mTitleText.setText("Node #" + (nextNodeIndex+1) + " " + mNodeList.get(nextNodeIndex).name());
+			mDescriptionText.setText("For initializing the node, press start and begin walking the far reaches.");
 
-			nextNodeIndex++;
+			//nextNodeIndex++;
 		} else {
 		}
 	}
@@ -288,14 +280,16 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			mStartButton.setVisibility(View.INVISIBLE);
 			mStopButton.setVisibility(View.VISIBLE);
 			Log.d(TAG,"NodeConfig Started");
-			mTitleText.setText("Node " + nextNodeIndex + " of " + mNodeList.size() +
+			mTitleText.setText("Node " + (nextNodeIndex+1) + " of " + mNodeList.size() +
 					" " + mNodeList.get(nextNodeIndex).name());
-			mDescriptionText.setText("For initializing the node, press start and begin walking the far reaches.");
+			mDescriptionText.setText("Below is a list of current detected nodes and their signal strength.");
 		}
 
 		protected Void doInBackground(Integer... params) {
 			Log.d(TAG, "Starting to Generate List");
+			final MHAApplication app = (MHAApplication) getApplication();
 			ArrayList<NodeSignalRange> foundNodes = new ArrayList<NodeSignalRange>();
+			NodeConfiguration configurationSetup = NodeConfiguration.getInstance(getIntent());
 			while(!isCancelled()){
 				foundNodes = NodeConfiguration.generateNodeList(mNodeList.get(nextNodeIndex));
 				Log.d(TAG, "Generated Found Node List");
@@ -314,10 +308,14 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 					Toast.LENGTH_LONG).show();
 			mStopButton.setVisibility(View.INVISIBLE);
 			mNextButton.setVisibility(View.VISIBLE);
-			mStartButton.setVisibility(View.VISIBLE);
+			nextNodeIndex++;
+			//mStartButton.setVisibility(View.VISIBLE);
 		}
 		
 		protected void onPublishedProgress(ArrayList<NodeSignalRange> foundNodes){
+			mNodeSignalList.clear();
+			mNodeSignalList.addAll(foundNodes);
+			mNodeSignalAdapter.notifyDataSetChanged();
 			Log.d(TAG, "Publishing " + mNodeList.get(nextNodeIndex).name() + " data");
 		}
 
