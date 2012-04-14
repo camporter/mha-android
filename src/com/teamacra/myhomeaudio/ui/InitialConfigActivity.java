@@ -26,7 +26,7 @@ import com.teamacra.myhomeaudio.locations.NodeSignalRange;
 import com.teamacra.myhomeaudio.manager.NodeManager;
 import com.teamacra.myhomeaudio.node.Node;
 
-public class InitialConfigActivity extends SherlockFragmentActivity {
+public class InitialConfigActivity extends SherlockFragmentActivity implements OnClickListener {
 
 	private boolean welcomeComplete = false;
 	private int nextNodeIndex = 0;
@@ -35,10 +35,10 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 	private ArrayAdapter<Node> mNodeAdapter;
 	private ArrayList<NodeSignalRange> mNodeSignalList;
 	private ArrayAdapter<NodeSignalRange> mNodeSignalAdapter;
-	
-	AsyncTask<Integer, ArrayList<NodeSignalRange>, Void>  nodeConfig;
+
+	AsyncTask<Integer, ArrayList<NodeSignalRange>, Void> nodeConfig;
 	AsyncTask<String, Void, ArrayList<Node>> updateNodes;
-	
+
 	private Button mNextButton;
 	private Button mCancelButton;
 	private Button mRefreshButton;
@@ -48,93 +48,89 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 	private TextView mTitleText;
 	private TextView mDescriptionText;
 
-	private final String TAG ="InitialConfigActivity";
+	private final String TAG = "InitialConfigActivity";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		final MHAApplication app = (MHAApplication) getApplication();
 
 		super.onCreate(savedInstanceState);
 		setTheme(R.style.Theme_Sherlock);
 		setContentView(R.layout.initialconfig);
 
+		// Build the node list objects
 		mNodeList = new ArrayList<Node>();
 		mNodeAdapter = new ArrayAdapter<Node>(this, android.R.layout.simple_list_item_1, mNodeList);
 		ListView nodeListView = (ListView) findViewById(R.id.initialconfig_nodeList);
 		nodeListView.setAdapter(mNodeAdapter);
 
+		// Set up buttons
 		mNextButton = (Button) findViewById(R.id.initialconfig_nextButton);
-		mNextButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				changeActivityState();
-			}
-		});
+		mNextButton.setOnClickListener(this);
 
 		mRefreshButton = (Button) findViewById(R.id.initialconfig_refreshButton);
-		mRefreshButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Log.d(TAG, "Refresh Clicked");
-				if(updateNodes == null){
-					updateNodes = new UpdateNodes();
-					updateNodes.execute();
-				}else{
-					updateNodes.cancel(true);
-					updateNodes = new UpdateNodes();
-					updateNodes.execute();
-				}
-				
-			}
-		});
+		mRefreshButton.setOnClickListener(this);
 		mRefreshButton.setVisibility(View.GONE);
 
 		mCancelButton = (Button) findViewById(R.id.initialconfig_cancelButton);
-		mCancelButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				if (!app.isConfigured()) {
-					app.setLoggedOut();
-				}
-				finish();
-			}
-		});
+		mCancelButton.setOnClickListener(this);
 
 		mStartButton = (Button) findViewById(R.id.initialconfig_startButton);
-		mStartButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				nodeConfig = new NodeConfig();
-				nodeConfig.execute();
-			}
-		});
+		mStartButton.setOnClickListener(this);
 		mStartButton.setVisibility(View.GONE);
 
 		mStopButton = (Button) findViewById(R.id.initialconfig_stopButton);
-		mStopButton.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				nodeConfig.cancel(true);
-				if(nodeConfig.getStatus() == AsyncTask.Status.FINISHED){
-					Log.d(TAG, "Stop button clicked");
-				}
-			}
-		});
+		mStopButton.setOnClickListener(this);
 		mStopButton.setVisibility(View.GONE);
 
 		mTitleText = (TextView) findViewById(R.id.initialconfig_header);
 		mDescriptionText = (TextView) findViewById(R.id.initialconfig_description);
 
 		if (savedInstanceState == null) {
-			
+
 		} else {
 			welcomeComplete = savedInstanceState.containsKey("welcomeComplete") ? savedInstanceState
 					.getBoolean("welcomeComplete") : false;
+		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		if (v == this.mNextButton) {
+			// Go to the next configuration step
+			changeActivityState();
+			
+		} else if (v == this.mCancelButton) {
+			// Cancel the configuration process
+			MHAApplication app = (MHAApplication) getApplication();
+			if (!app.isConfigured()) {
+				// User is logged in but canceling config, so log them back out
+				app.setLoggedOut();
+			}
+			finish();
+			
+		} else if (v == this.mStartButton) {
+			// Start the node configuration scan
+			nodeConfig = new NodeConfig();
+			nodeConfig.execute();
+			
+		} else if (v == this.mStopButton) {
+			// Stop the node configuration scan
+			nodeConfig.cancel(true);
+			if (nodeConfig.getStatus() == AsyncTask.Status.FINISHED) {
+				Log.d(TAG, "Stop button clicked");
+			}
+			
+		} else if (v == this.mRefreshButton) {
+			// Refresh the list of nodes found
+			Log.d(TAG, "Refresh Clicked");
+			if (updateNodes == null) {
+				updateNodes = new UpdateNodes();
+				updateNodes.execute();
+			} else {
+				updateNodes.cancel(true);
+				updateNodes = new UpdateNodes();
+				updateNodes.execute();
+			}
 		}
 	}
 
@@ -182,25 +178,25 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			// We need to get from the server the nodes that are available
 			Log.d(TAG, "Starting Initial Update NodeList");
 			new UpdateNodes().execute();
-			
-		}else if (nextNodeIndex < mNodeList.size()) {
+
+		} else if (nextNodeIndex < mNodeList.size()) {
 			// Change button visibility
 			Log.d(TAG, "Changing Visibility of Buttons");
 			mStartButton.setVisibility(View.VISIBLE);
 			mNextButton.setVisibility(View.INVISIBLE);
 			mRefreshButton.setVisibility(View.GONE);
-		
+
 			mNodeSignalList = new ArrayList<NodeSignalRange>();
-			mNodeSignalAdapter = new ArrayAdapter<NodeSignalRange>(this, android.R.layout.simple_list_item_1, 
-					mNodeSignalList);
+			mNodeSignalAdapter = new ArrayAdapter<NodeSignalRange>(this,
+					android.R.layout.simple_list_item_1, mNodeSignalList);
 			ListView nodeListView = (ListView) findViewById(R.id.initialconfig_nodeList);
 			nodeListView.setAdapter(mNodeSignalAdapter);
-			
-			// Do individual Node scans
-			mTitleText.setText("Node #" + (nextNodeIndex+1) + " " + mNodeList.get(nextNodeIndex).name());
-			mDescriptionText.setText("For initializing the node, press start and begin walking the far reaches.");
 
-			//nextNodeIndex++;
+			// Do individual Node scans
+			mTitleText.setText("Node #" + (nextNodeIndex + 1) + " "
+					+ mNodeList.get(nextNodeIndex).name());
+			mDescriptionText
+					.setText("For initializing the node, press start and begin walking the far reaches.");
 		} else {
 		}
 	}
@@ -226,10 +222,13 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			progressDialog.dismiss();
 			if (result != null) {
 				if (result.size() == 0) {
-					AlertDialog.Builder alertBuilder = new AlertDialog.Builder(InitialConfigActivity.this);
+					AlertDialog.Builder alertBuilder = new AlertDialog.Builder(
+							InitialConfigActivity.this);
 					alertBuilder.setTitle("No nodes found!");
-					alertBuilder.setMessage("Please make sure your hardware is turned on, then try again.");
+					alertBuilder
+							.setMessage("Please make sure your hardware is turned on, then try again.");
 					alertBuilder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							// TODO Auto-generated method stub
@@ -245,7 +244,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 					mNodeList.clear();
 					mNodeList.addAll(result);
 					mNodeAdapter.notifyDataSetChanged();
-					
+
 				}
 			}
 		}
@@ -272,17 +271,19 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		}
 
 	}
-	
+
 	protected class NodeConfig extends AsyncTask<Integer, ArrayList<NodeSignalRange>, Void> {
+
 		MHAApplication app = (MHAApplication) InitialConfigActivity.this.getApplication();
 
 		protected void onPreExecute() {
 			mStartButton.setVisibility(View.INVISIBLE);
 			mStopButton.setVisibility(View.VISIBLE);
-			Log.d(TAG,"NodeConfig Started");
-			mTitleText.setText("Node " + (nextNodeIndex+1) + " of " + mNodeList.size() +
-					" " + mNodeList.get(nextNodeIndex).name());
-			mDescriptionText.setText("Below is a list of current detected nodes and their signal strength.");
+			Log.d(TAG, "NodeConfig Started");
+			mTitleText.setText("Node " + (nextNodeIndex + 1) + " of " + mNodeList.size() + " "
+					+ mNodeList.get(nextNodeIndex).name());
+			mDescriptionText
+					.setText("Below is a list of current detected nodes and their signal strength.");
 		}
 
 		protected Void doInBackground(Integer... params) {
@@ -290,7 +291,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 			final MHAApplication app = (MHAApplication) getApplication();
 			ArrayList<NodeSignalRange> foundNodes = new ArrayList<NodeSignalRange>();
 			NodeConfiguration configurationSetup = NodeConfiguration.getInstance(getIntent());
-			while(!isCancelled()){
+			while (!isCancelled()) {
 				foundNodes = NodeConfiguration.generateNodeList(mNodeList.get(nextNodeIndex));
 				Log.d(TAG, "Generated Found Node List");
 				onPublishedProgress(foundNodes);
@@ -301,18 +302,19 @@ public class InitialConfigActivity extends SherlockFragmentActivity {
 		protected void onPostExecute() {
 			Log.d(TAG, "NodeConfig Ended");
 		}
-		
-		protected void onCancelled(){
+
+		protected void onCancelled() {
 			Log.d(TAG, mNodeList.get(nextNodeIndex) + " configuration generated");
-			Toast.makeText(InitialConfigActivity.this, mNodeList.get(nextNodeIndex) + " configuration generated",
-					Toast.LENGTH_LONG).show();
+			Toast.makeText(InitialConfigActivity.this,
+					mNodeList.get(nextNodeIndex) + " configuration generated", Toast.LENGTH_LONG)
+					.show();
 			mStopButton.setVisibility(View.INVISIBLE);
 			mNextButton.setVisibility(View.VISIBLE);
 			nextNodeIndex++;
-			//mStartButton.setVisibility(View.VISIBLE);
+			// mStartButton.setVisibility(View.VISIBLE);
 		}
-		
-		protected void onPublishedProgress(ArrayList<NodeSignalRange> foundNodes){
+
+		protected void onPublishedProgress(ArrayList<NodeSignalRange> foundNodes) {
 			mNodeSignalList.clear();
 			mNodeSignalList.addAll(foundNodes);
 			mNodeSignalAdapter.notifyDataSetChanged();
