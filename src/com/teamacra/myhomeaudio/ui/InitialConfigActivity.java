@@ -24,6 +24,7 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
 import com.teamacra.myhomeaudio.locations.NodeConfiguration;
+import com.teamacra.myhomeaudio.locations.NodeSignalBoundary;
 import com.teamacra.myhomeaudio.locations.NodeSignalRange;
 import com.teamacra.myhomeaudio.manager.NodeManager;
 import com.teamacra.myhomeaudio.node.Node;
@@ -180,6 +181,8 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 			mDescriptionText
 					.setText("For initializing the node, press start and begin walking the far reaches.");
 		} else {
+			//Configuration done, send config information to server
+			//Exit configuration
 		}
 	}
 
@@ -269,6 +272,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 		private final ProgressDialog progressDialog = new ProgressDialog(
 						InitialConfigActivity.this);
 		private NodeConfiguration nodeSetup;
+		private int toastDuration = 5;
 			
 		protected void onPreExecute() {
 			Log.d(TAG, "NodeConfig Setup Started");
@@ -290,7 +294,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 		protected Void doInBackground(Integer... params) {
 			Log.d(TAG, "Starting to Generate List");
 			ArrayList<NodeSignalRange> foundNodes = new ArrayList<NodeSignalRange>();
-		//	config = new NodeConfiguration(app, mNodeList.get(nextNodeIndex));
+			nodeSetup = new NodeConfiguration(app, mNodeList.get(nextNodeIndex));
 			while (!isCancelled()) {
 				try {
 					Log.d(TAG,"Sleep");
@@ -299,15 +303,16 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 					Log.d(TAG,"Interrupting Sleep");
 				}
 				
-			//	config.updateNodeList();
-			//	foundNodes = config.getFoundNodes();
-				if(foundNodes.isEmpty()){
-					Log.d(TAG, "No nodes found");
+				if(nodeSetup.updateNodeList()){
+					foundNodes = nodeSetup.getFoundNodes();
+					Log.d(TAG,"Size of found node list: "+foundNodes.size());
+					if(foundNodes.size() > 0){
+						Log.d(TAG,"Found Node: "+foundNodes.get(0));
+					}
+				
 				}else{
-					Log.d(TAG, "Generated Found Node List, " + foundNodes.get(0)
-							+ " " + isCancelled());
+					Log.d(TAG,"Updating NodeList Failed");
 				}
-				onPublishedProgress(foundNodes);
 			}
 			return null;
 		}
@@ -315,17 +320,14 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 		protected void onCancelled() {
 			Log.d(TAG, mNodeList.get(nextNodeIndex) + " configuration generated");
 			Toast.makeText(InitialConfigActivity.this,
-					mNodeList.get(nextNodeIndex) + " configuration generated", Toast.LENGTH_LONG)
+					mNodeList.get(nextNodeIndex) + " configuration generated", toastDuration)
 					.show();
+			
+			NodeSignalBoundary sig = nodeSetup.generateNodeList();
 			mNextButton.setVisibility(View.VISIBLE);
 			mStartButton.setVisibility(View.INVISIBLE);
 			nextNodeIndex++;
 			Log.d(TAG, "NodeConfig Setup Ending");
 		}
-
-		protected void onPublishedProgress(ArrayList<NodeSignalRange> foundNodes) {
-			Log.d(TAG, "Publishing " + mNodeList.get(nextNodeIndex).name() + " data");
-		}
-
 	}
 }
