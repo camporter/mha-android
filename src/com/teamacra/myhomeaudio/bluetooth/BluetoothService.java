@@ -1,15 +1,6 @@
 package com.teamacra.myhomeaudio.bluetooth;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.http.HttpNode;
-import com.teamacra.myhomeaudio.http.HttpStream;
-import com.teamacra.myhomeaudio.ui.MyHomeAudioActivity;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -18,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -29,14 +19,6 @@ public class BluetoothService extends Service {
 	
 	private BluetoothAdapter mAdapter;
 	
-	private ArrayList<String> deviceList;
-	
-	private boolean isRunning;
-	
-	public synchronized ArrayList<String> getDeviceList() {
-		return new ArrayList<String>(deviceList);
-	}
-	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -45,9 +27,7 @@ public class BluetoothService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.i(TAG, "MHA BluetoothService being created!");
-		
-		deviceList = new ArrayList<String>();
+		Log.i(TAG, "BluetoothService is being created");
 		
 		mAdapter = BluetoothAdapter.getDefaultAdapter();
 		registerReceiver(mReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
@@ -58,17 +38,9 @@ public class BluetoothService extends Service {
 	
 	@Override
 	public void onStart(Intent intent, int startid) {
-		Log.i(TAG, "MHA BluetoothService being started");
+		Log.i(TAG, "BluetoothService is being started");
 		if (!mAdapter.isDiscovering()) {
-			isRunning = true;
 			mAdapter.startDiscovery();
-			while (isRunning) {
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) { }
-			}
-			mAdapter.cancelDiscovery();
-			stopSelf();
 		} else {
 			stopSelf();
 		}
@@ -89,39 +61,33 @@ public class BluetoothService extends Service {
 			
 			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 				// Discovery has found a device
-				Log.i(TAG, "Device was found!");
+				Log.i(TAG, "A bluetooth device was found");
 				
 				// Get the corresponding BluetoothDevice object
 				final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				
-				// get the RSSI value for this action
+				// get the RSSI value for this device
 				Integer rssi = (int) intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, (short) 0);
 				
-				deviceList.add(device.getName());
-				deviceList.add(String.valueOf(rssi));
-				
-				Log.i(TAG, device.getName());
-				Log.i(TAG, String.valueOf(rssi));
-				
-				
-				//Intent bIntent = new Intent();
-				
-				// TODO: Fix this to send RSSIs as well, some other data struct needed
-				//bIntent.setAction(BluetoothService.DEVICE_UPDATE);
-				//bIntent.putParcelableArrayListExtra("devices", deviceList);
-				//context.sendBroadcast(bIntent);
-				
+				// Broadcast to anyone listening all about the device found
+				Intent bIntent = new Intent();
+				bIntent.setAction(BluetoothService.DEVICE_UPDATE);
+				bIntent.putExtra("deviceName", device.getName());
+				bIntent.putExtra("deviceAddress", device.getAddress());
+				bIntent.putExtra("deviceRssi", rssi);
+				context.sendBroadcast(bIntent);
 				
 			}
 			else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
 				// Done trying to discover bluetooth devices
-				Log.i(TAG, "Discovery finished!");
+				Log.i(TAG, "Bluetooth discovery finished");
 				
-				BluetoothService.this.isRunning = false;
+				BluetoothService.this.mAdapter.cancelDiscovery();
+				BluetoothService.this.stopSelf();
 				
 			}
 			else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-				Log.i(TAG, "Discovery STARTING!");
+				Log.i(TAG, "Bluetooth discovery starting");
 			}
 			
 		}

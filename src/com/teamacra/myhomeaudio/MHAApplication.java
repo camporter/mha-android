@@ -2,15 +2,16 @@ package com.teamacra.myhomeaudio;
 
 import java.util.Calendar;
 
-//import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 
 import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -50,6 +51,8 @@ public class MHAApplication extends Application {
 		this.isConfigured = false;
 
 		checkBluetoothCapability();
+		
+		registerReceiver(mReceiver, new IntentFilter(BluetoothService.DEVICE_UPDATE));
 
 		Log.d(TAG, "Application created");
 	}
@@ -137,19 +140,24 @@ public class MHAApplication extends Application {
 			return null;
 		}
 	}
-
+	
+	/**
+	 * Use this to start the service to find other bluetooth signals near the device.
+	 * @param c
+	 */
 	public void startBluetoothService(Context c) {
 		final AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
-		Intent i = null;
-		//i= new Intent(c, BluetoothService.class);
+		Intent i = new Intent(c, BluetoothService.class);
 		discoveryPendingIntent = PendingIntent.getService(c, 0, i, 0);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
 		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 20000,
 				discoveryPendingIntent);
-
 	}
-
+	
+	/**
+	 * 
+	 */
 	public void stopBluetoothService() {
 		final AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
 		alarmManager.cancel(discoveryPendingIntent);
@@ -210,5 +218,16 @@ public class MHAApplication extends Application {
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
-
+	
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			
+			if (BluetoothService.DEVICE_UPDATE.equals(action)) {
+				Log.i(TAG, "Receiving that a device was found");
+				Log.i(TAG, "Name: "+intent.getStringExtra("deviceName"));
+			}
+		}
+	};
 }

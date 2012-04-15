@@ -10,6 +10,7 @@ import com.teamacra.myhomeaudio.http.HttpNode;
 import com.teamacra.myhomeaudio.node.Node;
 
 public class NodeManager {
+
 	private ArrayList<Node> nodeList;
 	private HttpNode httpNode;
 
@@ -41,13 +42,13 @@ public class NodeManager {
 			nodeList = newNodeList;
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	public synchronized boolean updateConfiguration(ArrayList<Node> newConfiguration) {
 		return false;
-		
+
 	}
 
 	/**
@@ -55,11 +56,27 @@ public class NodeManager {
 	 * <p>
 	 * Note, this doesn't automatically update from the server.
 	 * 
+	 * @param onlyActive
+	 *            Whether to return only nodes that are currently active.
+	 * 
 	 * @return ArrayList of Node within manager
 	 */
-	public ArrayList<Node> getNodeList() {
-		Log.d(TAG,"Returning NodeList, size ="+nodeList.size());
-		return new ArrayList<Node>(nodeList);
+	public ArrayList<Node> getNodeList(boolean onlyActive) {
+
+		if (onlyActive) {
+			ArrayList<Node> activeList = new ArrayList<Node>();
+			for (Iterator<Node> i = nodeList.iterator(); i.hasNext();) {
+				Node nextNode = i.next();
+				if (nextNode.isActive()) {
+					activeList.add(nextNode);
+				}
+			}
+			return activeList;
+		} else {
+			Log.d(TAG, "Returning NodeList, size =" + nodeList.size());
+			return new ArrayList<Node>(nodeList);
+		}
+
 	}
 
 	/**

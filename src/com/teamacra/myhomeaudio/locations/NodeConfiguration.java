@@ -28,9 +28,6 @@ import com.teamacra.myhomeaudio.node.Node;
  * 
  */
 
-
-
-
 public class NodeConfiguration {
 
 	private Intent intent_;
@@ -49,8 +46,9 @@ public class NodeConfiguration {
 	}
 
 	public boolean updateNodeList() {
-		//BluetoothService discoveryService = new BluetoothService();
-		//discoveryService.getApplicationContext().startActivity(new Intent(intent_));
+		// BluetoothService discoveryService = new BluetoothService();
+		// discoveryService.getApplicationContext().startActivity(new
+		// Intent(intent_));
 		return true;
 	}
 

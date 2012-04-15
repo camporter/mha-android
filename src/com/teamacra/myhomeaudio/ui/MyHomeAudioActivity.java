@@ -314,7 +314,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 		protected ArrayList<Node> doInBackground(String... notUsed) {
 			NodeManager nm = NodeManager.getInstance(app);
 			nm.updateNodes();
-			return nm.getNodeList();
+			return nm.getNodeList(true);
 		}
 
 		protected void onPostExecute(ArrayList<Node> result) {
