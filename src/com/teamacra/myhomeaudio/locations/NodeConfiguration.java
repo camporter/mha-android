@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import android.content.Intent;
 
 import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+//import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 import com.teamacra.myhomeaudio.node.Node;
 
 public class NodeConfiguration {

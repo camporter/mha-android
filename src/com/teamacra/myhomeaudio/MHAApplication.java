@@ -2,7 +2,7 @@ package com.teamacra.myhomeaudio;
 
 import java.util.Calendar;
 
-import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+//import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 
 import android.app.AlarmManager;
 import android.app.Application;
@@ -140,7 +140,8 @@ public class MHAApplication extends Application {
 
 	public void startBluetoothService(Context c) {
 		final AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
-		Intent i = new Intent(c, BluetoothService.class);
+		Intent i = null;
+		//i= new Intent(c, BluetoothService.class);
 		discoveryPendingIntent = PendingIntent.getService(c, 0, i, 0);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());

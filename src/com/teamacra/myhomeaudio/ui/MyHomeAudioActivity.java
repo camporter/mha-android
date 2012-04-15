@@ -10,7 +10,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
-import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+//import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 import com.teamacra.myhomeaudio.http.HttpClient;
 import com.teamacra.myhomeaudio.http.HttpNode;
 import com.teamacra.myhomeaudio.http.HttpStream;
