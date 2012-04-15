@@ -20,9 +20,11 @@ import com.teamacra.myhomeaudio.node.Node;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 
 public class HttpNode extends HttpBase {
+	private static final String TAG = "HttpNode";
 	
 	public HttpNode(MHAApplication app) {
 		super(app);
@@ -46,37 +48,8 @@ public class HttpNode extends HttpBase {
 				
 				for (int i=0; i < responseArray.length(); i++) {
 					JSONObject node = responseArray.getJSONObject(i);
-					Node newNode = new Node(node.getInt("id"), node.getString("name"), "");
-					resultArray.add(newNode);
-				}
-				
-				return resultArray;
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	/**
-	 * Sends a request for the list of active nodes on the server.
-	 * 
-	 * @return An ArrayList of the active nodes. Returns null if the request failed.
-	 */
-	public ArrayList<Node> getActiveNodes() {
-		JSONObject requestObject = new JSONObject();
-		
-		try {
-			requestObject.put("session", app.getSessionId());
-			JSONObject responseObject = executePostRequest("/node/activelist", requestObject);
-			
-			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
-				JSONArray responseArray = responseObject.getJSONArray("nodes");
-				ArrayList<Node> resultArray = new ArrayList<Node>(responseArray.length());
-				
-				for (int i=0; i < responseArray.length(); i++) {
-					JSONObject node = responseArray.getJSONObject(i);
-					Node newNode = new Node(node.getInt("id"), node.getString("name"), "");
+					Log.d(TAG, node.toString());
+					Node newNode = new Node(node.getInt("id"), node.getString("name"), node.getString("bluetoothaddress"), node.getBoolean("active"));
 					resultArray.add(newNode);
 				}
 				

@@ -10,7 +10,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
-import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+//import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 import com.teamacra.myhomeaudio.http.HttpClient;
 import com.teamacra.myhomeaudio.http.HttpNode;
 import com.teamacra.myhomeaudio.http.HttpStream;
@@ -321,7 +321,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 			if (result != null) {
 				mNodeList.clear();
 				// Set a 'follow' option
-				mNodeList.add(new Node(-1, "FOLLOW ME", ""));
+				mNodeList.add(new Node(-1, "FOLLOW ME", "", true));
 				mNodeList.addAll(result);
 				mNodeAdapter.notifyDataSetChanged();
 			}

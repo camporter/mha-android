@@ -5,36 +5,57 @@ import java.util.ArrayList;
 import android.content.Intent;
 
 import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+//import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 import com.teamacra.myhomeaudio.node.Node;
+
+/*
+ * Create a node Configuration object
+ * -stores node being configured
+ * -array of nodeSignalRanges
+ * 
+ * method
+ * -generate NSB
+ * 
+ * process
+ * init nodeConfig
+ * call bluetooth dscoveryservice
+ * create device list (string)
+ * convert to deviceobject
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+
+
 
 public class NodeConfiguration {
 
-	private static Intent intent_;
-	private static NodeConfiguration nodeConfig;
+	private Intent intent_;
+	private final MHAApplication app_;
+	private Node setupNode_;
+	private ArrayList<Node> foundNodes_;
 
-	private NodeConfiguration(Intent intent) {
-		intent_ = intent;
+	public NodeConfiguration(MHAApplication app, Node node) {
+		app_ = app;
+		setupNode_ = node;
+		foundNodes_ = new ArrayList<Node>();
 	}
 
-	public static ArrayList<NodeSignalRange> generateNodeList(Node node) {
-		// TODO Auto-generated method stub
-		ArrayList<NodeSignalRange> foundNodes = new ArrayList<NodeSignalRange>();
+	public NodeSignalBoundary generateNodeList() {
+		return new NodeSignalBoundary(0);
+	}
 
+	public boolean updateNodeList() {
 		//BluetoothService discoveryService = new BluetoothService();
 		//discoveryService.getApplicationContext().startActivity(new Intent(intent_));
-
-		NodeSignalRange r = new NodeSignalRange(0, 2, 7);
-		foundNodes.add(r);
-
-		return foundNodes;
+		return true;
 	}
 
-	public static NodeConfiguration getInstance(Intent intent) {
-		if (nodeConfig == null) {
-			nodeConfig = new NodeConfiguration(intent);
-		}
-		return nodeConfig;
+	public ArrayList<NodeSignalRange> getFoundNodes() {
+		return new ArrayList<NodeSignalRange>();
 	}
 
 }
