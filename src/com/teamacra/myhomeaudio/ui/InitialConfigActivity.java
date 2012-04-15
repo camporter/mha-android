@@ -42,7 +42,6 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 	private Button mCancelButton;
 	private Button mRefreshButton;
 	private Button mStartButton;
-	private Button mStopButton;
 
 	private TextView mTitleText;
 	private TextView mDescriptionText;
@@ -77,10 +76,6 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 		mStartButton.setOnClickListener(this);
 		mStartButton.setVisibility(View.GONE);
 
-		mStopButton = (Button) findViewById(R.id.initialconfig_stopButton);
-		mStopButton.setOnClickListener(this);
-		mStopButton.setVisibility(View.GONE);
-
 		mTitleText = (TextView) findViewById(R.id.initialconfig_header);
 		mDescriptionText = (TextView) findViewById(R.id.initialconfig_description);
 
@@ -111,13 +106,6 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 			// Start the node configuration scan
 			nodeConfig = new NodeConfig();
 			nodeConfig.execute();
-			
-		} else if (v == this.mStopButton) {
-			// Stop the node configuration scan
-			nodeConfig.cancel(true);
-			if (nodeConfig.getStatus() == AsyncTask.Status.FINISHED) {
-				Log.d(TAG, "Stop button clicked");
-			}
 			
 		} else if (v == this.mRefreshButton) {
 			// Refresh the list of nodes found
@@ -270,10 +258,10 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 		final MHAApplication app = (MHAApplication) InitialConfigActivity.this.getApplication();
 		private final ProgressDialog progressDialog = new ProgressDialog(
 						InitialConfigActivity.this);
-		
+		private NodeConfiguration nodeSetup;
 			
 		protected void onPreExecute() {
-			Log.d(TAG, "NodeConfig Started");
+			Log.d(TAG, "NodeConfig Setup Started");
 			progressDialog.setTitle("Node " + (nextNodeIndex + 1) + " of "
 					+ mNodeList.size() + " "+ mNodeList.get(nextNodeIndex).name());
 			progressDialog.setMessage("Press Back Button to End Scan");
@@ -281,7 +269,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 			progressDialog.setButton(DialogInterface.BUTTON_POSITIVE,"Stop", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
-					Log.d(TAG, "Progress Dialog onClick Stop");
+					Log.d(TAG, "Progress Dialog Stop Pressed ");
 					nodeConfig.cancel(true);
 					progressDialog.dismiss();
 				}
@@ -292,12 +280,13 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 		protected Void doInBackground(Integer... params) {
 			Log.d(TAG, "Starting to Generate List");
 			ArrayList<NodeSignalRange> foundNodes = new ArrayList<NodeSignalRange>();
-			NodeConfiguration config;
 		//	config = new NodeConfiguration(app, mNodeList.get(nextNodeIndex));
 			while (!isCancelled()) {
-				int i = 0;
-				while (i < 100000) {
-					i++;
+				try {
+					Log.d(TAG,"Sleep");
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
+					Log.d(TAG,"Interrupting Sleep");
 				}
 				
 			//	config.updateNodeList();
@@ -310,12 +299,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 				}
 				onPublishedProgress(foundNodes);
 			}
-			Log.d(TAG, "Back pressed Ending");
 			return null;
-		}
-
-		protected void onPostExecute() {
-			Log.d(TAG, "NodeConfig Ended");
 		}
 
 		protected void onCancelled() {
@@ -323,14 +307,13 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 			Toast.makeText(InitialConfigActivity.this,
 					mNodeList.get(nextNodeIndex) + " configuration generated", Toast.LENGTH_LONG)
 					.show();
-			mStopButton.setVisibility(View.INVISIBLE);
 			mNextButton.setVisibility(View.VISIBLE);
+			mStartButton.setVisibility(View.INVISIBLE);
 			nextNodeIndex++;
-			// mStartButton.setVisibility(View.VISIBLE);
+			Log.d(TAG, "NodeConfig Setup Ending");
 		}
 
 		protected void onPublishedProgress(ArrayList<NodeSignalRange> foundNodes) {
-
 			Log.d(TAG, "Publishing " + mNodeList.get(nextNodeIndex).name() + " data");
 		}
 
