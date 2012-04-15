@@ -66,7 +66,7 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 		MHAApplication app = (MHAApplication) this.getApplication();
 
 		// Check to make sure the user is not already logged in and/or configured
-		if (app.isLoggedIn() && app.isConfigured()) {
+		if (app.isLoggedIn() /* && app.isConfigured() */) {
 			// Logged in and configured
 			startActivity(new Intent(this, MyHomeAudioActivity.class));
 			
@@ -250,11 +250,11 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 				this.progressDialog.dismiss();
 
 				Intent mhaIntent;
-				if (app.isConfigured()) {
+				//if (app.isConfigured()) {
 					mhaIntent = new Intent(LoginActivity.this, MyHomeAudioActivity.class);
-				} else {
+				/*} else {
 					mhaIntent = new Intent(LoginActivity.this, InitialConfigActivity.class);
-				}
+				}*/
 
 				LoginActivity.this.startActivity(mhaIntent);
 			} else {

@@ -1,8 +1,15 @@
 package com.teamacra.myhomeaudio;
 
+import java.util.Calendar;
+
+import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,28 +35,22 @@ public class MHAApplication extends Application {
 	private String username;
 	private String password;
 	private String sessionId;
-	
+
 	private boolean bluetoothEnabledDevice;
-	
+
+	private PendingIntent discoveryPendingIntent;
+
 	private String serverAddress;
 	private int port = 8080;
 
-	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		this.isLoggedIn = false;
 		this.isConfigured = false;
 
-		/*SharedPreferences sharedPrefs = this.getSharedPreferences(PREFS_NAME, 0);
-		SharedPreferences.Editor prefsEditor = sharedPrefs.edit();
-		// TODO: Do discovery instead of hardcoded value!
-		prefsEditor.putString("hostAddress", "http://192.168.68.160:8080");
-		prefsEditor.commit();
-		*/
-		
 		checkBluetoothCapability();
-		
+
 		Log.d(TAG, "Application created");
 	}
 
@@ -59,13 +60,18 @@ public class MHAApplication extends Application {
 		Log.d(TAG, "Application terminated");
 		super.onTerminate();
 	}
-	
+
 	/**
 	 * Set the application state as logged in.
-	 * @param username Username for the user logged in.
-	 * @param password Password for the user logged in.
-	 * @param sessionId Session assigned to the client for the user.
-	 * @param configured Configuration status for the user
+	 * 
+	 * @param username
+	 *            Username for the user logged in.
+	 * @param password
+	 *            Password for the user logged in.
+	 * @param sessionId
+	 *            Session assigned to the client for the user.
+	 * @param configured
+	 *            Configuration status for the user
 	 */
 	public void setLoggedIn(String username, String password, String sessionId, boolean configured) {
 		this.username = username;
@@ -74,7 +80,7 @@ public class MHAApplication extends Application {
 		this.isLoggedIn = true;
 		this.isConfigured = configured;
 	}
-	
+
 	/**
 	 * Set the application state as logged out.
 	 */
@@ -85,31 +91,32 @@ public class MHAApplication extends Application {
 		this.password = null;
 		this.sessionId = null;
 	}
-	
+
 	/**
 	 * Is a user logged in?
+	 * 
 	 * @return Whether a user is logged in.
 	 */
 	public boolean isLoggedIn() {
 		return this.isLoggedIn;
 	}
-	
-	public boolean isConfigured(){
+
+	public boolean isConfigured() {
 		return this.isConfigured;
 	}
-	
+
 	public void setServerAddress(String serverAddress) {
 		this.serverAddress = serverAddress;
 	}
-	
+
 	public String getServerAddress() {
 		return this.serverAddress;
 	}
-	
+
 	public int getPort() {
 		return this.port;
 	}
-	
+
 	public String getLocalAddress() {
 		if (isWifiConnected()) {
 			WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
@@ -120,7 +127,7 @@ public class MHAApplication extends Application {
 			return null;
 		}
 	}
-	
+
 	public String getMacAddress() {
 		if (isWifiConnected()) {
 			WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
@@ -130,11 +137,27 @@ public class MHAApplication extends Application {
 			return null;
 		}
 	}
-	
+
+	public void startBluetoothService(Context c) {
+		final AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
+		Intent i = new Intent(c, BluetoothService.class);
+		discoveryPendingIntent = PendingIntent.getService(c, 0, i, 0);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(System.currentTimeMillis());
+		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 20000,
+				discoveryPendingIntent);
+
+	}
+
+	public void stopBluetoothService() {
+		final AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
+		alarmManager.cancel(discoveryPendingIntent);
+	}
+
 	public String getSessionId() {
 		return this.sessionId;
 	}
-	
+
 	/**
 	 * Gets the name of the device's bluetooth.
 	 * 
@@ -142,14 +165,14 @@ public class MHAApplication extends Application {
 	 */
 	public String getBluetoothName() {
 		checkBluetoothCapability();
-		
+
 		if (this.bluetoothEnabledDevice) {
 			BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 			return bluetoothAdapter.getName();
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Update the bluetooth capability of the device.
 	 */
@@ -162,15 +185,16 @@ public class MHAApplication extends Application {
 			this.bluetoothEnabledDevice = true;
 		}
 	}
-	
+
 	/**
 	 * Is the client device capable of bluetooth?
+	 * 
 	 * @return
 	 */
 	public boolean isBluetoothCapableDevice() {
 		return this.bluetoothEnabledDevice;
 	}
-	
+
 	/**
 	 * Checks if the device WiFi is connected. We want the client to be on WiFi,
 	 * not a mobile network, so that the device can communicate with the server.

@@ -1,6 +1,7 @@
 package com.teamacra.myhomeaudio.ui;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -9,6 +10,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
+import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 import com.teamacra.myhomeaudio.http.HttpClient;
 import com.teamacra.myhomeaudio.http.HttpNode;
 import com.teamacra.myhomeaudio.http.HttpStream;
@@ -22,7 +24,9 @@ import com.viewpagerindicator.TitleProvider;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -150,7 +154,14 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 
 	public void onStart() {
 		super.onStart();
+		((MHAApplication) getApplication()).startBluetoothService(this);
 	}
+	
+	public void onDestroy() {
+		((MHAApplication) getApplication()).stopBluetoothService();
+		super.onDestroy();
+	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -169,6 +180,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 			return true;
 			
 		} else if (item.getItemId() == 2) {
+			// Start configuration
 			Intent startConfigIntent = new Intent(this, InitialConfigActivity.class);
 			this.startActivity(startConfigIntent);
 			

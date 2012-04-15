@@ -30,6 +30,6 @@
         </activity>
         <activity android:name=".ui.InitialConfigActivity" android:label="Configure My Home Audio">
         </activity>
-        <!-- <service android:enabled="true" android:name=".bluetooth.DiscoveryService" android:process=":DiscoveryService"/> -->
+        <service android:enabled="true" android:name=".bluetooth.BluetoothService" />
     </application>
 </manifest>

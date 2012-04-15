@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import android.content.Intent;
 
 import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.bluetooth.DiscoveryService;
+import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 import com.teamacra.myhomeaudio.node.Node;
 
 public class NodeConfiguration {
@@ -21,8 +21,8 @@ public class NodeConfiguration {
 		// TODO Auto-generated method stub
 		ArrayList<NodeSignalRange> foundNodes = new ArrayList<NodeSignalRange>();
 
-		DiscoveryService discoveryService = new DiscoveryService();
-		discoveryService.getApplicationContext().startActivity(new Intent(intent_));
+		//BluetoothService discoveryService = new BluetoothService();
+		//discoveryService.getApplicationContext().startActivity(new Intent(intent_));
 
 		NodeSignalRange r = new NodeSignalRange(0, 2, 7);
 		foundNodes.add(r);
