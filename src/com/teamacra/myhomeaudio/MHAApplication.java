@@ -76,7 +76,8 @@ public class MHAApplication extends Application {
 	 * @param configured
 	 *            Configuration status for the user
 	 */
-	public void setLoggedIn(String username, String password, String sessionId, boolean configured) {
+	public void setLoggedIn(String username, String password, String sessionId,
+			boolean configured) {
 		this.username = username;
 		this.password = password;
 		this.sessionId = sessionId;
@@ -159,7 +160,8 @@ public class MHAApplication extends Application {
 	 * 
 	 */
 	public void stopBluetoothService() {
-		final AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
+		final AlarmManager alarmManager = (AlarmManager) this
+				.getSystemService(ALARM_SERVICE);
 		alarmManager.cancel(discoveryPendingIntent);
 	}
 
@@ -176,7 +178,8 @@ public class MHAApplication extends Application {
 		checkBluetoothCapability();
 
 		if (this.bluetoothEnabledDevice) {
-			BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+			BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+					.getDefaultAdapter();
 			return bluetoothAdapter.getName();
 		}
 		return null;
@@ -187,7 +190,8 @@ public class MHAApplication extends Application {
 	 */
 	private void checkBluetoothCapability() {
 		// Set whether the client is capable of using bluetooth
-		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+				.getDefaultAdapter();
 		if (bluetoothAdapter == null) {
 			this.bluetoothEnabledDevice = false;
 		} else {
@@ -213,7 +217,8 @@ public class MHAApplication extends Application {
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = null;
 		if (connectivityManager != null) {
-			networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+			networkInfo = connectivityManager
+					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 			System.out.println(networkInfo.isConnected());
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
