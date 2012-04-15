@@ -3,6 +3,8 @@ package com.teamacra.myhomeaudio.manager;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import android.util.Log;
+
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.http.HttpNode;
 import com.teamacra.myhomeaudio.node.Node;
@@ -11,10 +13,12 @@ public class NodeManager {
 	private ArrayList<Node> nodeList;
 	private HttpNode httpNode;
 
+	private static final String TAG = "NodeManager";
 	private static NodeManager instance;
 
 	private NodeManager(MHAApplication app) {
 		httpNode = new HttpNode(app);
+		nodeList = new ArrayList<Node>();
 	}
 
 	public synchronized static NodeManager getInstance(MHAApplication app) {
@@ -37,6 +41,7 @@ public class NodeManager {
 			nodeList = newNodeList;
 			return true;
 		}
+		
 		return false;
 	}
 	
@@ -50,15 +55,11 @@ public class NodeManager {
 	 * <p>
 	 * Note, this doesn't automatically update from the server.
 	 * 
-	 * @return
+	 * @return ArrayList of Node within manager
 	 */
 	public ArrayList<Node> getNodeList() {
+		Log.d(TAG,"Returning NodeList, size ="+nodeList.size());
 		return new ArrayList<Node>(nodeList);
-	}
-	
-	
-	public ArrayList<Node> getActiveNodeList(){
-		return httpNode.getActiveNodes();
 	}
 
 	/**

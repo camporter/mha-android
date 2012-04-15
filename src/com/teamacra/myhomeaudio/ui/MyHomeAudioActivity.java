@@ -321,7 +321,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 			if (result != null) {
 				mNodeList.clear();
 				// Set a 'follow' option
-				mNodeList.add(new Node(-1, "FOLLOW ME", ""));
+				mNodeList.add(new Node(-1, "FOLLOW ME", "", true));
 				mNodeList.addAll(result);
 				mNodeAdapter.notifyDataSetChanged();
 			}

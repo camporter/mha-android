@@ -1,6 +1,7 @@
 package com.teamacra.myhomeaudio.ui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.w3c.dom.NodeList;
 import android.app.AlertDialog;
@@ -196,7 +197,16 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements O
 		protected ArrayList<Node> doInBackground(String... notUsed) {
 			NodeManager nm = NodeManager.getInstance(app);
 			nm.updateNodes();
-			return nm.getActiveNodeList();
+			Iterator<Node> i = nm.getNodeList().iterator();
+			ArrayList<Node> activeNodes = new ArrayList<Node>();
+			Node node;
+			while(i.hasNext()){
+				node = i.next();
+				if(node.isActive()){
+					activeNodes.add(node);
+				}
+			}
+			return activeNodes;
 		}
 
 		protected void onPostExecute(ArrayList<Node> result) {
