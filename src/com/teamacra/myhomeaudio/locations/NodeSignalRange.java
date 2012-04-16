@@ -1,55 +1,61 @@
 package com.teamacra.myhomeaudio.locations;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.teamacra.myhomeaudio.manager.NodeManager;
+import com.teamacra.myhomeaudio.node.Node;
 
 /**
- * Stores node rssi ranges, the
- * maximum and minimum values
- * obtains for a particular node
- *
+ * For any room, each node has a signal range. The NodeSignalRange object
+ * represents what a single node's ranges are within that room. We can get the
+ * max and min values that were recorded.
+ * 
  */
+public class NodeSignalRange {
 
-public class NodeSignalRange{
-	private final int id; //node id
-	private int min;
-	private int max;
-	
-	public NodeSignalRange(int id){
-		this(id, Integer.MIN_VALUE, Integer.MAX_VALUE);
+	private Node node;
+	private Integer min;
+	private Integer max;
+
+	public NodeSignalRange(Node node) {
+		this.node = node;
 	}
-	public NodeSignalRange(int id, int min, int max){
-		this.id = id;
-		this.min = min;
-		this.max = max;		
-	}
-	
-	public boolean checkRange(int value){
-		if(value >= min && value <= max){
+
+	public boolean checkRange(int value) {
+		if (value >= min && value <= max) {
 			return true;
 		}
 		return false;
 	}
 	
-	public void setMin(int min){
-		this.min = min;
+	/**
+	 * Stores the rssi value.
+	 * 
+	 * @param rssi The RSSI value that our node's signal is at.
+	 */
+	public void storeRSSIValue(int rssi) {
+		if (min == null && max ==null) {
+			// No RSSI values have been recorded yet
+			min = rssi;
+			max = rssi;
+		}
+		else if (rssi < min) {
+			min = rssi;
+		} else if (rssi > max) {
+			max = rssi;
+		}
 	}
-	public void setMax(int max){
-		this.max = max;
-	}
-	
-	public int getMin(){
+
+	public int getMin() {
 		return min;
 	}
-	public int getMax(){
+
+	public int getMax() {
 		return max;
 	}
-	
-	public int getNodeId(){
-		return id;
+
+	public Node getNode() {
+		return node;
 	}
 
 	public String toJSONString() {
@@ -57,16 +63,15 @@ public class NodeSignalRange{
 		try {
 			object.put("max", max);
 			object.put("min", min);
-			object.put("id", id);
+			object.put("id", node.id());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return object.toString();
 	}
-	
-	public String toString(){
-		return "id: "+ id + " min: " + min + " max: " + max;
+
+	public String toString() {
+		return "id: " + node.id() + " min: " + min + " max: " + max;
 	}
 }

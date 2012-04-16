@@ -1,17 +1,14 @@
 package com.teamacra.myhomeaudio.ui;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 
-import org.w3c.dom.NodeList;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,9 +23,8 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
-import com.teamacra.myhomeaudio.locations.NodeConfiguration;
-import com.teamacra.myhomeaudio.locations.NodeSignalBoundary;
-import com.teamacra.myhomeaudio.locations.NodeSignalRange;
+import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+import com.teamacra.myhomeaudio.manager.ConfigurationManager;
 import com.teamacra.myhomeaudio.manager.NodeManager;
 import com.teamacra.myhomeaudio.node.Node;
 
@@ -41,8 +37,8 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 	private ArrayList<Node> mNodeList;
 	private ArrayAdapter<Node> mNodeAdapter;
 
-	AsyncTask<Integer, ArrayList<NodeSignalRange>, Void> nodeConfig;
-	AsyncTask<String, Void, ArrayList<Node>> updateNodes;
+	AsyncTask<Integer, Void, Void> mNodeConfigTask;
+	AsyncTask<String, Void, ArrayList<Node>> mUpdateNodesTask;
 
 	private Button mNextButton;
 	private Button mCancelButton;
@@ -54,12 +50,20 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 	private final String TAG = "InitialConfigActivity";
 
+	private MHAApplication app;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(TAG, "InitialConfigActivity Started");
+
+		app = (MHAApplication) getApplication();
+
 		super.onCreate(savedInstanceState);
 		setTheme(R.style.Theme_Sherlock);
 		setContentView(R.layout.initialconfig);
+		
+		// Want to listen to any device updates the BluetoothService broadcasts
+		registerReceiver(mReceiver, new IntentFilter(BluetoothService.DEVICE_UPDATE));
 
 		// Build the node list objects
 		mNodeList = new ArrayList<Node>();
@@ -102,7 +106,6 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 		} else if (v == this.mCancelButton) {
 			// Cancel the configuration process
-			MHAApplication app = (MHAApplication) getApplication();
 			if (!app.isConfigured()) {
 				// User is logged in but canceling config, so log them back out
 				app.setLoggedOut();
@@ -111,27 +114,25 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 		} else if (v == this.mStartButton) {
 			// Start the node configuration scan
-			nodeConfig = new NodeConfigTask();
-			nodeConfig.execute();
+			mNodeConfigTask = new NodeConfigTask();
+			mNodeConfigTask.execute();
 
 		} else if (v == this.mRefreshButton) {
 			// Refresh the list of nodes found
 			Log.d(TAG, "Refresh Clicked");
-			if (updateNodes == null) {
-				updateNodes = new UpdateNodesTask();
-				updateNodes.execute();
+			if (mUpdateNodesTask == null) {
+				mUpdateNodesTask = new UpdateNodesTask();
+				mUpdateNodesTask.execute();
 			} else {
-				updateNodes.cancel(true);
-				updateNodes = new UpdateNodesTask();
-				updateNodes.execute();
+				mUpdateNodesTask.cancel(true);
+				mUpdateNodesTask = new UpdateNodesTask();
+				mUpdateNodesTask.execute();
 			}
 		}
 	}
 
 	public void onResume() {
 		super.onResume();
-
-		MHAApplication app = (MHAApplication) this.getApplication();
 
 		// Check to make sure the user is not already configured
 		if (app.isConfigured()) {
@@ -191,10 +192,9 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	private class UpdateNodesTask extends AsyncTask<String, Void, ArrayList<Node>> {
+	private class UpdateNodesTask extends
+			AsyncTask<String, Void, ArrayList<Node>> {
 
-		MHAApplication app = (MHAApplication) InitialConfigActivity.this
-				.getApplication();
 		private final ProgressDialog progressDialog = new ProgressDialog(
 				InitialConfigActivity.this);
 
@@ -244,11 +244,14 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		}
 	}
 
+	/**
+	 * Task to send the configuration off to the server.
+	 * 
+	 * 
+	 */
+	protected class SendConfigTask extends
+			AsyncTask<String, Void, ArrayList<Node>> {
 
-	protected class SendConfigTask extends AsyncTask<String, Void, ArrayList<Node>> {
-
-		MHAApplication app = (MHAApplication) InitialConfigActivity.this
-				.getApplication();
 		private final ProgressDialog progressDialog = new ProgressDialog(
 				InitialConfigActivity.this);
 
@@ -270,15 +273,19 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 	}
 
-	protected class NodeConfigTask extends
-			AsyncTask<Integer, ArrayList<NodeSignalRange>, Void> {
+	/**
+	 * Task that runs the scan for signals near a specific node.
+	 * 
+	 * @author Cameron
+	 * 
+	 */
+	protected class NodeConfigTask extends AsyncTask<Integer, Void, Void> {
 
-		final MHAApplication app = (MHAApplication) InitialConfigActivity.this
-				.getApplication();
 		private final ProgressDialog progressDialog = new ProgressDialog(
 				InitialConfigActivity.this);
-		private NodeConfiguration nodeSetup;
-		private int toastDuration = 5;
+		
+		private ConfigurationManager configManager = ConfigurationManager
+				.getInstance(app);
 
 		protected void onPreExecute() {
 			Log.d(TAG, "NodeConfigTask Setup Started");
@@ -289,10 +296,11 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			progressDialog.setCancelable(false);
 			progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Stop",
 					new DialogInterface.OnClickListener() {
+
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							Log.d(TAG, "Progress Dialog Stop Pressed ");
-							nodeConfig.cancel(true);
+							mNodeConfigTask.cancel(true);
 							progressDialog.dismiss();
 						}
 					});
@@ -301,47 +309,59 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 		protected Void doInBackground(Integer... params) {
 			Log.d(TAG, "Starting to Generate List");
-			ArrayList<NodeSignalRange> foundNodes = new ArrayList<NodeSignalRange>();
-			nodeSetup = new NodeConfiguration(app, mNodeList.get(nextNodeIndex));
+			
+			// Start the bluetooth service to go find devices
+			app.startBluetoothService(app, true);
+			
 			while (!isCancelled()) {
+				// Wait until the task is cancelled
 				try {
-					Log.d(TAG, "Sleep");
-					Thread.sleep(2000);
+					Thread.sleep(500);
 				} catch (InterruptedException e) {
-					Log.d(TAG, "Interrupting Sleep");
-				}
-
-				if (nodeSetup.updateNodeList()) {
-					foundNodes = nodeSetup.getFoundNodes();
-					Log.d(TAG, "Size of found node list: " + foundNodes.size());
-					Log.d(TAG, Arrays.toString(foundNodes.toArray()));
-				} else {
-					Log.d(TAG, "Updating NodeList Failed");
+					e.printStackTrace();
 				}
 			}
 			return null;
 		}
 
 		protected void onCancelled() {
+			// Stop the bluetooth discovery
+			app.stopBluetoothService();
 			Log.d(TAG, mNodeList.get(nextNodeIndex)
 					+ " configuration generated");
 			Toast.makeText(InitialConfigActivity.this,
 					mNodeList.get(nextNodeIndex) + " configuration generated",
-					toastDuration).show();
-
-			NodeSignalBoundary sig = nodeSetup.generateNodeList();
-			Log.d(TAG, sig.toJSONString());
+					Toast.LENGTH_SHORT).show();
+			Log.i(TAG, configManager.getJSON(mNodeList.get(nextNodeIndex)));
 			mNextButton.setVisibility(View.VISIBLE);
 			mStartButton.setVisibility(View.INVISIBLE);
 			nextNodeIndex++;
 			Log.d(TAG, "NodeConfigTask Setup Ending");
 		}
+
+		public void receiveDevice(String name, String bluetoothAddress, int rssi) {
+			configManager.storeDeviceSignal(mNodeList.get(nextNodeIndex), name,
+					bluetoothAddress, rssi);
+		}
 	}
-	
+
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			
+			String action = intent.getAction();
+
+			if (BluetoothService.DEVICE_UPDATE.equals(action)) {
+				// If the nodeConfigTask is executing, then pass the device
+				// information off to it
+				if (mNodeConfigTask != null) {
+					((NodeConfigTask) mNodeConfigTask).receiveDevice(
+							intent.getStringExtra("deviceName"),
+							intent.getStringExtra("deviceAddress"),
+							intent.getIntExtra("rssi", Integer.MIN_VALUE));
+				}
+				Log.i(TAG, "Name: " + intent.getStringExtra("deviceName"));
+			}
 		}
 	};
 }

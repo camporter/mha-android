@@ -154,7 +154,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 
 	public void onStart() {
 		super.onStart();
-		((MHAApplication) getApplication()).startBluetoothService(this);
+		((MHAApplication) getApplication()).startBluetoothService(this, true);
 	}
 	
 	public void onDestroy() {

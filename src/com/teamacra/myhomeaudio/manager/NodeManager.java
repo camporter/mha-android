@@ -46,7 +46,8 @@ public class NodeManager {
 		return false;
 	}
 
-	public synchronized boolean updateConfiguration(ArrayList<Node> newConfiguration) {
+	public synchronized boolean updateConfiguration(
+			ArrayList<Node> newConfiguration) {
 		return false;
 
 	}
@@ -83,17 +84,51 @@ public class NodeManager {
 	 * 
 	 * @param id
 	 *            The id of the Node.
-	 * @return The Node object, or null if a matching stream object wasn't
-	 *         found.
+	 * @return The Node object, or null if a matching node is not found.
 	 */
 	public Node getNode(int id) {
 		for (Iterator<Node> i = nodeList.iterator(); i.hasNext();) {
 			Node nextNode = i.next();
 			if (nextNode.id() == id) {
-				return new Node(nextNode);
+				return nextNode;
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Get a Node by its name, address, and whether it is active.
+	 * 
+	 * @param name The name of the node.
+	 * @param bluetoothAddress The bluetooth address of the node.
+	 * @param isActive Whether the node is active.
+	 * @return The Node object, or null if a matching node is not found.
+	 */
+	public Node getNode(String name, String bluetoothAddress, boolean isActive) {
+		for (Iterator<Node> i = nodeList.iterator(); i.hasNext();) {
+			Node nextNode = i.next();
+			if (nextNode.name().equals(name)
+					&& nextNode.bluetoothAddress().equals(bluetoothAddress)
+					&& (nextNode.isActive() == isActive)) {
+				return nextNode;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Makes sure that the exact same Node instance exists in the node manager.
+	 * 
+	 * @param node 
+	 * @return
+	 */
+	public boolean nodeExists(Node node) {
+		for (Iterator<Node> i = nodeList.iterator(); i.hasNext();) {
+			if (i.next() == node) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

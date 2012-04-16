@@ -1,42 +1,43 @@
 package com.teamacra.myhomeaudio.node;
 
-
 public class Node {
+
 	private int id;
 	private String name;
-	private String bluetoothaddress;
+	private String bluetoothAddress;
 	private boolean isActive;
-	
-	public Node(int id, String name, String bluetoothaddress, boolean active) {
+
+	public Node(int id, String name, String bluetoothAddress, boolean active) {
 		this.id = id;
 		this.name = name;
-		this.bluetoothaddress = bluetoothaddress;
+		this.bluetoothAddress = bluetoothAddress;
 		this.isActive = active;
 	}
-	
+
 	public Node(Node node) {
 		id = node.id();
 		name = node.name();
-		bluetoothaddress = node.bluetoothaddress();
+		bluetoothAddress = node.bluetoothAddress();
 		isActive = node.isActive();
 	}
 
-	public boolean isActive(){
+	public boolean isActive() {
 		return isActive;
 	}
+
 	public String name() {
 		return name;
 	}
-	
+
 	public int id() {
 		return id;
 	}
-	
-	public String bluetoothaddress() {
-		return bluetoothaddress;
+
+	public String bluetoothAddress() {
+		return bluetoothAddress;
 	}
-	
+
 	public String toString() {
-		return id+" "+name;
+		return id + " " + name;
 	}
 }

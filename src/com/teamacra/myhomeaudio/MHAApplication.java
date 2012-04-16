@@ -52,9 +52,6 @@ public class MHAApplication extends Application {
 
 		checkBluetoothCapability();
 
-		registerReceiver(mReceiver, new IntentFilter(
-				BluetoothService.DEVICE_UPDATE));
-
 		Log.d(TAG, "Application created");
 	}
 
@@ -240,17 +237,4 @@ public class MHAApplication extends Application {
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
-
-	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String action = intent.getAction();
-
-			if (BluetoothService.DEVICE_UPDATE.equals(action)) {
-				Log.i(TAG, "Receiving that a device was found");
-				Log.i(TAG, "Name: " + intent.getStringExtra("deviceName"));
-			}
-		}
-	};
 }
