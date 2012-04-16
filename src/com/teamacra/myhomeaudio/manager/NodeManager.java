@@ -76,7 +76,6 @@ public class NodeManager {
 			Log.d(TAG, "Returning NodeList, size =" + nodeList.size());
 			return new ArrayList<Node>(nodeList);
 		}
-
 	}
 
 	/**

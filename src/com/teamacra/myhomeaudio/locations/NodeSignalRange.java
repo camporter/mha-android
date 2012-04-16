@@ -15,15 +15,16 @@ import com.teamacra.myhomeaudio.manager.NodeManager;
 
 public class NodeSignalRange{
 	private final int id; //node id
-	private final int min;
-	private final int max;
+	private int min;
+	private int max;
 	
+	public NodeSignalRange(int id){
+		this(id, Integer.MIN_VALUE, Integer.MAX_VALUE);
+	}
 	public NodeSignalRange(int id, int min, int max){
 		this.id = id;
 		this.min = min;
-		this.max = max;
-		JSONArray a = new JSONArray();
-		
+		this.max = max;		
 	}
 	
 	public boolean checkRange(int value){
@@ -31,6 +32,20 @@ public class NodeSignalRange{
 			return true;
 		}
 		return false;
+	}
+	
+	public void setMin(int min){
+		this.min = min;
+	}
+	public void setMax(int max){
+		this.max = max;
+	}
+	
+	public int getMin(){
+		return min;
+	}
+	public int getMax(){
+		return max;
 	}
 	
 	public int getNodeId(){

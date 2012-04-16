@@ -1,6 +1,7 @@
 package com.teamacra.myhomeaudio.ui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.w3c.dom.NodeList;
@@ -243,7 +244,8 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	protected class SendConfigTask extends AsyncTask<String, Void, Void> {
+
+	protected class SendConfigTask extends AsyncTask<String, Void, ArrayList<Node>> {
 
 		MHAApplication app = (MHAApplication) InitialConfigActivity.this
 				.getApplication();
@@ -256,9 +258,10 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			progressDialog.show();
 		}
 
-		protected Void doInBackground(String... notUsed) {
+		protected ArrayList<Node> doInBackground(String... notUsed) {
 			NodeManager nm = NodeManager.getInstance(app);
-			return null;
+			nm.updateNodes();
+			return nm.getNodeList(true);
 		}
 
 		protected void onPostExecute() {
@@ -286,7 +289,6 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			progressDialog.setCancelable(false);
 			progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Stop",
 					new DialogInterface.OnClickListener() {
-
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							Log.d(TAG, "Progress Dialog Stop Pressed ");
@@ -312,10 +314,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 				if (nodeSetup.updateNodeList()) {
 					foundNodes = nodeSetup.getFoundNodes();
 					Log.d(TAG, "Size of found node list: " + foundNodes.size());
-					if (foundNodes.size() > 0) {
-						Log.d(TAG, "Found Node: " + foundNodes.get(0));
-					}
-
+					Log.d(TAG, Arrays.toString(foundNodes.toArray()));
 				} else {
 					Log.d(TAG, "Updating NodeList Failed");
 				}
@@ -331,6 +330,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 					toastDuration).show();
 
 			NodeSignalBoundary sig = nodeSetup.generateNodeList();
+			Log.d(TAG, sig.toJSONString());
 			mNextButton.setVisibility(View.VISIBLE);
 			mStartButton.setVisibility(View.INVISIBLE);
 			nextNodeIndex++;
