@@ -15,7 +15,9 @@ import android.util.Log;
 public class BluetoothService extends Service {
 	private final String TAG = "BluetoothService";
 	
-	public static final String DEVICE_UPDATE = "com.teamacra.myhomeaudio.bluetooth";
+	public static final String DEVICE_UPDATE = "com.teamacra.myhomeaudio.bluetooth.device";
+	public static final String DISCOVERY_START = "com.teamacra.myhomeaudio.bluetooth.start";
+	public static final String DISCOVERY_FINISH = "com.teamacra.myhomeaudio.bluetooth.finish";
 	
 	private BluetoothAdapter mAdapter;
 	
@@ -82,12 +84,18 @@ public class BluetoothService extends Service {
 				// Done trying to discover bluetooth devices
 				Log.i(TAG, "Bluetooth discovery finished");
 				
+				Intent finishIntent = new Intent();
+				finishIntent.setAction(BluetoothService.DISCOVERY_FINISH);
+				context.sendBroadcast(finishIntent);
+				
 				BluetoothService.this.mAdapter.cancelDiscovery();
 				BluetoothService.this.stopSelf();
 				
 			}
 			else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
 				Log.i(TAG, "Bluetooth discovery starting");
+				Intent startIntent = new Intent();
+				startIntent.setAction(BluetoothService.DISCOVERY_START);
 			}
 			
 		}

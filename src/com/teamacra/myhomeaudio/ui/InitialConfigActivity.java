@@ -6,6 +6,8 @@ import java.util.Iterator;
 import org.w3c.dom.NodeList;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
@@ -108,18 +110,18 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 		} else if (v == this.mStartButton) {
 			// Start the node configuration scan
-			nodeConfig = new NodeConfig();
+			nodeConfig = new NodeConfigTask();
 			nodeConfig.execute();
 
 		} else if (v == this.mRefreshButton) {
 			// Refresh the list of nodes found
 			Log.d(TAG, "Refresh Clicked");
 			if (updateNodes == null) {
-				updateNodes = new UpdateNodes();
+				updateNodes = new UpdateNodesTask();
 				updateNodes.execute();
 			} else {
 				updateNodes.cancel(true);
-				updateNodes = new UpdateNodes();
+				updateNodes = new UpdateNodesTask();
 				updateNodes.execute();
 			}
 		}
@@ -168,7 +170,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 			// We need to get from the server the nodes that are available
 			Log.d(TAG, "Starting Initial Update NodeList");
-			new UpdateNodes().execute();
+			new UpdateNodesTask().execute();
 
 		} else if (nextNodeIndex < mNodeList.size()) {
 			// Change button visibility
@@ -188,7 +190,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	private class UpdateNodes extends AsyncTask<String, Void, ArrayList<Node>> {
+	private class UpdateNodesTask extends AsyncTask<String, Void, ArrayList<Node>> {
 
 		MHAApplication app = (MHAApplication) InitialConfigActivity.this
 				.getApplication();
@@ -241,7 +243,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	protected class SendConfig extends AsyncTask<String, Void, Void> {
+	protected class SendConfigTask extends AsyncTask<String, Void, Void> {
 
 		MHAApplication app = (MHAApplication) InitialConfigActivity.this
 				.getApplication();
@@ -265,7 +267,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 	}
 
-	protected class NodeConfig extends
+	protected class NodeConfigTask extends
 			AsyncTask<Integer, ArrayList<NodeSignalRange>, Void> {
 
 		final MHAApplication app = (MHAApplication) InitialConfigActivity.this
@@ -276,7 +278,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		private int toastDuration = 5;
 
 		protected void onPreExecute() {
-			Log.d(TAG, "NodeConfig Setup Started");
+			Log.d(TAG, "NodeConfigTask Setup Started");
 			progressDialog.setTitle("Node " + (nextNodeIndex + 1) + " of "
 					+ mNodeList.size() + " "
 					+ mNodeList.get(nextNodeIndex).name());
@@ -332,7 +334,14 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			mNextButton.setVisibility(View.VISIBLE);
 			mStartButton.setVisibility(View.INVISIBLE);
 			nextNodeIndex++;
-			Log.d(TAG, "NodeConfig Setup Ending");
+			Log.d(TAG, "NodeConfigTask Setup Ending");
 		}
 	}
+	
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			
+		}
+	};
 }

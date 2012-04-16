@@ -118,7 +118,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 				}
 				
 				// Update the assigned nodes
-				new AssignNodes().execute(newlyAssignedNodeList);
+				new AssignNodesTask().execute(newlyAssignedNodeList);
 			}
 		});
 
@@ -141,14 +141,14 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				new AddStream().execute(mAddStreamEditText.getText().toString());
+				new AddStreamTask().execute(mAddStreamEditText.getText().toString());
 			}
 		});
 		mAddStreamDialog = builder.create();
 		
 		// Run the update stuff
-		new UpdateStreams().execute("");
-		new UpdateNodes().execute("");
+		new UpdateStreamsTask().execute("");
+		new UpdateNodesTask().execute("");
 
 	}
 
@@ -227,7 +227,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 	 * @author cameron
 	 * 
 	 */
-	private class AddStream extends AsyncTask<String, Void, ArrayList<Stream>> {
+	private class AddStreamTask extends AsyncTask<String, Void, ArrayList<Stream>> {
 
 		private final ProgressDialog progressDialog = new ProgressDialog(MyHomeAudioActivity.this);
 		private AlertDialog failureDialog;
@@ -275,7 +275,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 	 * @author cameron
 	 * 
 	 */
-	private class UpdateStreams extends AsyncTask<String, Void, ArrayList<Stream>> {
+	private class UpdateStreamsTask extends AsyncTask<String, Void, ArrayList<Stream>> {
 
 		MHAApplication app = (MHAApplication) MyHomeAudioActivity.this.getApplication();
 
@@ -303,7 +303,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 		}
 	}
 
-	private class UpdateNodes extends AsyncTask<String, Void, ArrayList<Node>> {
+	private class UpdateNodesTask extends AsyncTask<String, Void, ArrayList<Node>> {
 
 		MHAApplication app = (MHAApplication) MyHomeAudioActivity.this.getApplication();
 
@@ -328,7 +328,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 		}
 	}
 
-	private class AssignNodes extends AsyncTask<ArrayList<Node>, Void, Boolean> {
+	private class AssignNodesTask extends AsyncTask<ArrayList<Node>, Void, Boolean> {
 
 		MHAApplication app = (MHAApplication) MyHomeAudioActivity.this.getApplication();
 

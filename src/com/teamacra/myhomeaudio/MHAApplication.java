@@ -51,8 +51,9 @@ public class MHAApplication extends Application {
 		this.isConfigured = false;
 
 		checkBluetoothCapability();
-		
-		registerReceiver(mReceiver, new IntentFilter(BluetoothService.DEVICE_UPDATE));
+
+		registerReceiver(mReceiver, new IntentFilter(
+				BluetoothService.DEVICE_UPDATE));
 
 		Log.d(TAG, "Application created");
 	}
@@ -76,7 +77,8 @@ public class MHAApplication extends Application {
 	 * @param configured
 	 *            Configuration status for the user
 	 */
-	public void setLoggedIn(String username, String password, String sessionId, boolean configured) {
+	public void setLoggedIn(String username, String password, String sessionId,
+			boolean configured) {
 		this.username = username;
 		this.password = password;
 		this.sessionId = sessionId;
@@ -140,27 +142,44 @@ public class MHAApplication extends Application {
 			return null;
 		}
 	}
-	
+
 	/**
-	 * Use this to start the service to find other bluetooth signals near the device.
+	 * Use this to start the service to find other bluetooth signals near the
+	 * device.
+	 * 
 	 * @param c
+	 *            The context to create the intent in.
+	 * @param repeating
+	 *            Whether to schedule the service to continuously run.
 	 */
-	public void startBluetoothService(Context c) {
-		final AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
-		Intent i = new Intent(c, BluetoothService.class);
-		discoveryPendingIntent = PendingIntent.getService(c, 0, i, 0);
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTimeInMillis(System.currentTimeMillis());
-		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 20000,
-				discoveryPendingIntent);
+	public void startBluetoothService(Context c, boolean repeating) {
+		Intent serviceIntent = new Intent(c, BluetoothService.class);
+		
+		if (repeating) {
+			final AlarmManager alarmManager = (AlarmManager) this
+					.getSystemService(ALARM_SERVICE);
+			discoveryPendingIntent = PendingIntent.getService(c, 0, serviceIntent, 0);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis());
+			alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
+					calendar.getTimeInMillis(), 14000, discoveryPendingIntent);
+		} else {
+			c.startService(serviceIntent);
+		}
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void stopBluetoothService() {
-		final AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
-		alarmManager.cancel(discoveryPendingIntent);
+		if (discoveryPendingIntent != null) {
+			final AlarmManager alarmManager = (AlarmManager) this
+					.getSystemService(ALARM_SERVICE);
+			alarmManager.cancel(discoveryPendingIntent);
+		}
+		
+		Intent serviceIntent = new Intent(this, BluetoothService.class);
+		this.stopService(serviceIntent);
 	}
 
 	public String getSessionId() {
@@ -176,7 +195,8 @@ public class MHAApplication extends Application {
 		checkBluetoothCapability();
 
 		if (this.bluetoothEnabledDevice) {
-			BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+			BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+					.getDefaultAdapter();
 			return bluetoothAdapter.getName();
 		}
 		return null;
@@ -187,7 +207,8 @@ public class MHAApplication extends Application {
 	 */
 	private void checkBluetoothCapability() {
 		// Set whether the client is capable of using bluetooth
-		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+		BluetoothAdapter bluetoothAdapter = BluetoothAdapter
+				.getDefaultAdapter();
 		if (bluetoothAdapter == null) {
 			this.bluetoothEnabledDevice = false;
 		} else {
@@ -213,20 +234,22 @@ public class MHAApplication extends Application {
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = null;
 		if (connectivityManager != null) {
-			networkInfo = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+			networkInfo = connectivityManager
+					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 			System.out.println(networkInfo.isConnected());
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
-	
+
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
-			
+
 			if (BluetoothService.DEVICE_UPDATE.equals(action)) {
 				Log.i(TAG, "Receiving that a device was found");
-				Log.i(TAG, "Name: "+intent.getStringExtra("deviceName"));
+				Log.i(TAG, "Name: " + intent.getStringExtra("deviceName"));
 			}
 		}
 	};
