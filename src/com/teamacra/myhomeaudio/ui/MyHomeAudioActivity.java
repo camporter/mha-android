@@ -1,32 +1,9 @@
 package com.teamacra.myhomeaudio.ui;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-
-import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.teamacra.myhomeaudio.MHAApplication;
-import com.teamacra.myhomeaudio.R;
-//import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
-import com.teamacra.myhomeaudio.http.HttpClient;
-import com.teamacra.myhomeaudio.http.HttpNode;
-import com.teamacra.myhomeaudio.http.HttpStream;
-import com.teamacra.myhomeaudio.manager.NodeManager;
-import com.teamacra.myhomeaudio.manager.StreamManager;
-import com.teamacra.myhomeaudio.node.Node;
-import com.teamacra.myhomeaudio.stream.Stream;
-import com.viewpagerindicator.PageIndicator;
-import com.viewpagerindicator.TabPageIndicator;
-import com.viewpagerindicator.TitleProvider;
 
 import android.app.ActionBar;
-import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -37,7 +14,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,12 +21,26 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
+import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.R;
+import com.teamacra.myhomeaudio.manager.NodeManager;
+import com.teamacra.myhomeaudio.manager.StreamManager;
+import com.teamacra.myhomeaudio.node.Node;
+import com.teamacra.myhomeaudio.stream.Stream;
+import com.teamacra.myhomeaudio.ui.fragment.SongFragment;
+import com.teamacra.myhomeaudio.ui.fragment.TestFragment;
+import com.viewpagerindicator.PageIndicator;
+import com.viewpagerindicator.TabPageIndicator;
+import com.viewpagerindicator.TitleProvider;
 
 public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnNavigationListener {
 	
@@ -71,8 +61,9 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 	private ArrayList<Node> mNodeList;
 	private ArrayAdapter<Node> mNodeAdapter;
 	private ListView mNodeListView;
-
-	private static final String[] CONTENT = new String[] { "Test", "Test 2", "Test 3", "Test 4" };
+	
+	// Media stuff
+	private SongFragment mSongFragment;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -121,7 +112,10 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 				new AssignNodesTask().execute(newlyAssignedNodeList);
 			}
 		});
-
+		
+		// Setup the fragments
+		mSongFragment = SongFragment.newInstance();
+		
 		// Setup the tabpages
 		mAdapter = new TabAdapter(getSupportFragmentManager());
 		mPager = (ViewPager) findViewById(R.id.tabPager);
@@ -346,25 +340,38 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 		}
 	}
 
-	private class TabAdapter extends TestFragmentAdapter implements TitleProvider {
-
+	private class TabAdapter extends FragmentPagerAdapter implements TitleProvider {
+		private final String[] CONTENT = new String[] { "Songs", "Artists", "Albums", "Genres" };
+		
 		public TabAdapter(FragmentManager fm) {
 			super(fm);
 		}
 
 		@Override
 		public Fragment getItem(int position) {
-			return TestFragment.newInstance(MyHomeAudioActivity.CONTENT[position]);
+			switch(position) {
+			case 0:
+				// 
+				return mSongFragment;
+			case 1:
+				// Show artist list
+				return TestFragment.newInstance("artist");
+			case 2:
+				return TestFragment.newInstance("album");
+			default:
+				return TestFragment.newInstance("genre");
+			}
+			//return TestFragment.newInstance(CONTENT[position]);
 		}
 
 		@Override
 		public int getCount() {
-			return MyHomeAudioActivity.CONTENT.length;
+			return CONTENT.length;
 		}
 
 		@Override
 		public String getTitle(int position) {
-			return MyHomeAudioActivity.CONTENT[position % MyHomeAudioActivity.CONTENT.length]
+			return CONTENT[position % CONTENT.length]
 					.toUpperCase();
 		}
 	}

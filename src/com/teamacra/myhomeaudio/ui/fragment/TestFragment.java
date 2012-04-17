@@ -1,4 +1,4 @@
-package com.teamacra.myhomeaudio.ui;
+package com.teamacra.myhomeaudio.ui.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
