@@ -24,6 +24,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
 import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+import com.teamacra.myhomeaudio.http.HttpClient;
+import com.teamacra.myhomeaudio.http.StatusCode;
 import com.teamacra.myhomeaudio.manager.ConfigurationManager;
 import com.teamacra.myhomeaudio.manager.NodeManager;
 import com.teamacra.myhomeaudio.node.Node;
@@ -61,9 +63,10 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setTheme(R.style.Theme_Sherlock);
 		setContentView(R.layout.initialconfig);
-		
+
 		// Want to listen to any device updates the BluetoothService broadcasts
-		registerReceiver(mReceiver, new IntentFilter(BluetoothService.DEVICE_UPDATE));
+		registerReceiver(mReceiver, new IntentFilter(
+				BluetoothService.DEVICE_UPDATE));
 
 		// Build the node list objects
 		mNodeList = new ArrayList<Node>();
@@ -141,6 +144,11 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			this.startActivity(intent);
 		}
 	}
+	
+	public void onDestroy() {
+		super.onDestroy();
+		unregisterReceiver(mReceiver);
+	}
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -176,7 +184,6 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 		} else if (nextNodeIndex < mNodeList.size()) {
 			// Change button visibility
-			Log.d(TAG, "Changing Visibility of Buttons");
 			mStartButton.setVisibility(View.VISIBLE);
 			mNextButton.setVisibility(View.INVISIBLE);
 			mRefreshButton.setVisibility(View.GONE);
@@ -188,6 +195,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 					.setText("For initializing the node, press start and begin walking the far reaches.");
 		} else {
 			// Configuration done, send config information to server
+			new SendConfigTask().execute();
 			// Exit configuration
 		}
 	}
@@ -249,9 +257,10 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 	 * 
 	 * 
 	 */
-	protected class SendConfigTask extends
-			AsyncTask<String, Void, ArrayList<Node>> {
+	protected class SendConfigTask extends AsyncTask<String, Void, Integer> {
 
+		private AlertDialog successDialog;
+		private AlertDialog failureDialog;
 		private final ProgressDialog progressDialog = new ProgressDialog(
 				InitialConfigActivity.this);
 
@@ -261,14 +270,68 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			progressDialog.show();
 		}
 
-		protected ArrayList<Node> doInBackground(String... notUsed) {
-			NodeManager nm = NodeManager.getInstance(app);
-			nm.updateNodes();
-			return nm.getNodeList(true);
+		protected Integer doInBackground(String... notUsed) {
+			// Get the configuration from the ConfigurationManager and send it
+			// to the server
+			ConfigurationManager configManager = ConfigurationManager
+					.getInstance(app);
+			HttpClient client = new HttpClient(app);
+			return client.initialConfig(configManager.getConfigurationJSON());
 		}
 
-		protected void onPostExecute() {
+		protected void onPostExecute(Integer statusCode) {
 			progressDialog.dismiss();
+
+			if (statusCode == StatusCode.STATUS_OK) {
+				// Configuration was sent successfully
+				AlertDialog.Builder success = new AlertDialog.Builder(
+						InitialConfigActivity.this);
+				success.setTitle("Configuration complete!");
+				success.setMessage("Your device is now configured to use My Home Audio.");
+				success.setNeutralButton("Done",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								successDialog.dismiss();
+								// Forward the user back to the
+								// MyHomeAudioActivity
+								Intent intent = new Intent(
+										InitialConfigActivity.this,
+										MyHomeAudioActivity.class);
+								InitialConfigActivity.this
+										.startActivity(intent);
+							}
+						});
+				successDialog = success.create();
+				successDialog.show();
+			} else {
+				// Configuration sending failed
+				AlertDialog.Builder failure = new AlertDialog.Builder(
+						InitialConfigActivity.this);
+				failure.setTitle("Configuration failed!");
+				failure.setMessage("Make sure your device can talk to the server over the network and try again.");
+				failure.setNeutralButton("OK",
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								failureDialog.dismiss();
+
+								// Restart the activity
+								Intent intent = new Intent(
+										InitialConfigActivity.this,
+										InitialConfigActivity.class);
+								InitialConfigActivity.this.finish();
+								InitialConfigActivity.this
+										.startActivity(intent);
+							}
+						});
+				failureDialog = failure.create();
+				failureDialog.show();
+			}
 		}
 
 	}
@@ -283,7 +346,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 		private final ProgressDialog progressDialog = new ProgressDialog(
 				InitialConfigActivity.this);
-		
+
 		private ConfigurationManager configManager = ConfigurationManager
 				.getInstance(app);
 
@@ -309,10 +372,10 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 		protected Void doInBackground(Integer... params) {
 			Log.d(TAG, "Starting to Generate List");
-			
+
 			// Start the bluetooth service to go find devices
 			app.startBluetoothService(app, true);
-			
+
 			while (!isCancelled()) {
 				// Wait until the task is cancelled
 				try {
@@ -332,7 +395,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			Toast.makeText(InitialConfigActivity.this,
 					mNodeList.get(nextNodeIndex) + " configuration generated",
 					Toast.LENGTH_SHORT).show();
-			Log.i(TAG, configManager.getJSON(mNodeList.get(nextNodeIndex)));
+
 			mNextButton.setVisibility(View.VISIBLE);
 			mStartButton.setVisibility(View.INVISIBLE);
 			nextNodeIndex++;

@@ -110,21 +110,20 @@ public class NodeSignature {
 
 	// {"id":1,"nodeSignalRanges":[{"id":1,"min":1,"max":10},{"id":2,"min":2,"max":14},{"id":3,"min":5,"max":7}]}
 
-	public String toJSONString() {
+	public JSONObject toJSON() {
 		JSONObject object = new JSONObject();
 		JSONArray array = new JSONArray();
 		try {
 			object.put("id", node.id());
 
-			Iterator<NodeSignalRange> range = nodeSignalRanges.iterator();
-			while (range.hasNext()) {
-				array.put(range.next());
+			for (Iterator<NodeSignalRange> i = nodeSignalRanges.iterator(); i.hasNext();) {
+				array.put(i.next().toJSON());
 			}
 			object.put("nodeSignalRanges", array);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-		return object.toString();
+		return object;
 	}
 }

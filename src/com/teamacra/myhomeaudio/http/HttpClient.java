@@ -2,12 +2,11 @@ package com.teamacra.myhomeaudio.http;
 
 import java.util.Arrays;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.teamacra.myhomeaudio.MHAApplication;
-
-import android.content.SharedPreferences;
 
 public class HttpClient extends HttpBase {
 
@@ -67,11 +66,23 @@ public class HttpClient extends HttpBase {
 	 * @param sessionId The session to log out of.
 	 * @return The status code from the server indicating the result.
 	 */
-	public int logout(String sessionId) {
+	public int logout() {
 		JSONObject requestObject = new JSONObject();
 		try {
-			requestObject.put("session", sessionId);
+			requestObject.put("session", app.getSessionId());
 			return executeSimplePostRequest("/client/logout", requestObject);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return StatusCode.STATUS_FAILED;
+	}
+	
+	public int initialConfig(JSONArray signaturesAsJSON) {
+		JSONObject requestObject = new JSONObject();
+		try {
+			requestObject.put("session", app.getSessionId());
+			requestObject.put("signatures", signaturesAsJSON);
+			return executeSimplePostRequest("/client/initialconfig", requestObject);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

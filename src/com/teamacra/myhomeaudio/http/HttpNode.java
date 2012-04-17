@@ -60,46 +60,4 @@ public class HttpNode extends HttpBase {
 		}
 		return null;
 	}
-	
-	public void sendRSSIValues(ArrayList<String> deviceList) {
-		
-		try {
-			String url = "http://"+app.getServerAddress()+":"+app.getPort()+"/client/rssi";
-			System.out.println("Sending RSSI values to server");
-			HttpPost httpPost = new HttpPost(url);
-			
-			String jsonOutput = "[ ";
-			
-			int i =0;
-			
-			for (String item : deviceList) {
-				if (i == 0)
-				{
-					jsonOutput += "{ \"name\" : \""+item+"\", ";
-					i++;
-				} else {
-					jsonOutput += "\"rssi\" : "+item+" },";
-					i--;
-				}
-			}
-			
-			jsonOutput += " ]";
-			
-			httpPost.setEntity(new StringEntity(jsonOutput));
-			
-			HttpResponse response = this.httpClient.execute(httpPost);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public int updateConfiguration(ArrayList<Node> newConfiguration) {
-		JSONObject requestObject = new JSONObject();
-		try {
-			requestObject.put("nodes", "");
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return StatusCode.STATUS_FAILED;
-	}
 }

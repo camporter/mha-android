@@ -58,7 +58,7 @@ public class NodeSignalRange {
 		return node;
 	}
 
-	public String toJSONString() {
+	public JSONObject toJSON() {
 		JSONObject object = new JSONObject();
 		try {
 			object.put("max", max);
@@ -67,8 +67,8 @@ public class NodeSignalRange {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
-		return object.toString();
+		
+		return object;
 	}
 
 	public String toString() {

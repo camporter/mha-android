@@ -3,6 +3,8 @@ package com.teamacra.myhomeaudio.manager;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.json.JSONArray;
+
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.locations.NodeSignature;
 import com.teamacra.myhomeaudio.node.Node;
@@ -102,12 +104,14 @@ public class ConfigurationManager {
 		signatures.clear();
 	}
 	
-	public String getJSON(Node node) {
-		NodeSignature signature = getSignature(node);
+	
+	public JSONArray getConfigurationJSON() {
+		JSONArray array = new JSONArray();
 		
-		if (signature != null) {
-			return signature.toJSONString();
+		for (Iterator<NodeSignature> i = signatures.iterator(); i.hasNext();) {
+			array.put(i.next().toJSON());
 		}
-		return "";
+		
+		return array;
 	}
 }
