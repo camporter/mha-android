@@ -16,6 +16,7 @@ public class StreamManager {
 
 	private StreamManager(MHAApplication app) {
 		httpStream = new HttpStream(app);
+		streamList = new ArrayList<Stream>();
 	}
 	
 	public synchronized static StreamManager getInstance(MHAApplication app) {
@@ -36,7 +37,8 @@ public class StreamManager {
 		ArrayList<Stream> newStreamList = httpStream.getStreamList();
 		
 		if (newStreamList != null) {
-			streamList = newStreamList;
+			streamList.clear();
+			streamList.addAll(newStreamList);
 			return true;
 		}
 		return false;
