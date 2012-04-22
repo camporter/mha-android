@@ -8,12 +8,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.teamacra.myhomeaudio.media.MediaDescriptor;
 import com.teamacra.myhomeaudio.node.Node;
 
 public class Stream {
 	private int id;
 	private String name;
 	private ArrayList<Node> assignedNodes;
+	private MediaDescriptor currentMedia;
 
 	public Stream(int id, String name) {
 		this.id = id;
@@ -25,6 +27,8 @@ public class Stream {
 		this.id = stream.id();
 		this.name = stream.name();
 		this.assignedNodes = stream.getAssignedNodes();
+		this.currentMedia = stream.getCurrentMedia();
+		
 	}
 
 	public int id() {
@@ -33,6 +37,13 @@ public class Stream {
 
 	public String name() {
 		return name;
+	}
+	
+	public MediaDescriptor getCurrentMedia() {
+		if (currentMedia != null) {
+			return new MediaDescriptor(currentMedia);
+		}
+		return null;
 	}
 
 	public String toString() {

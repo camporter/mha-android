@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,7 +56,6 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 	// Stream stuff
 	private ArrayList<Stream> mStreamList;
 	private ArrayAdapter<Stream> mStreamAdapter;
-	private Stream mActiveStream;
 
 	// Node stuff
 	private ArrayList<Node> mNodeList;
@@ -192,8 +192,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 		MHAApplication app = (MHAApplication) this.getApplication();
 
 		// Change the active stream
-		mActiveStream = mStreamList.get(itemPosition);
-		Toast.makeText(this, "Selected " + mActiveStream, Toast.LENGTH_LONG).show();
+		//Toast.makeText(this, "Selected " + mActiveStream, Toast.LENGTH_LONG).show();
 
 		return true;
 	}
@@ -322,6 +321,11 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 		}
 	}
 
+	/**
+	 * Assigns nodes to the active stream.
+	 * @author cameron
+	 *
+	 */
 	private class AssignNodesTask extends AsyncTask<ArrayList<Node>, Void, Boolean> {
 
 		MHAApplication app = (MHAApplication) MyHomeAudioActivity.this.getApplication();
@@ -332,7 +336,12 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements OnN
 		protected Boolean doInBackground(ArrayList<Node>... node) {
 			StreamManager sm = StreamManager.getInstance(app);
 			
-			return sm.assignNodes(mActiveStream.id(), node[0]);
+			int selected = MyHomeAudioActivity.this.getSherlock().getActionBar().getSelectedNavigationIndex();
+			Stream activeStream = MyHomeAudioActivity.this.mStreamList.get(selected);
+			if (activeStream != null) {
+				return sm.assignNodes(activeStream.id(), node[0]);
+			}
+			return null;
 		}
 
 		protected void onPostExecute(Boolean result) {
