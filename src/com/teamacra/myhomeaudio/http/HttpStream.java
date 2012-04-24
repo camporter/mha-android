@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.media.MediaDescriptor;
 import com.teamacra.myhomeaudio.node.Node;
 import com.teamacra.myhomeaudio.stream.Stream;
 
@@ -90,12 +91,12 @@ public class HttpStream extends HttpBase {
 		return false;
 	}
 
-	public boolean play(String songName) {
+	public boolean play(Stream stream, MediaDescriptor mediaDescriptor) {
 		JSONObject requestObject = new JSONObject();
 		try {
 			requestObject.put("session", app.getSessionId());
-			requestObject.put("song", songName);
-			JSONObject responseObject = executePostRequest("/song/play", requestObject);
+			requestObject.put("media", mediaDescriptor.toJSONObject());
+			JSONObject responseObject = executePostRequest("/stream/play", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
 				return true;
 			}
@@ -125,7 +126,7 @@ public class HttpStream extends HttpBase {
 		
 		try {
 			requestObject.put("session", app.getSessionId());
-			requestObject.put("stream", stream.toJSONObject());
+			requestObject.put("stream", stream.id());
 			
 			JSONObject responseObject = executePostRequest("/stream/assign", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {

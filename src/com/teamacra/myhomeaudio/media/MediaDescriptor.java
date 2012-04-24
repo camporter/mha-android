@@ -1,5 +1,8 @@
 package com.teamacra.myhomeaudio.media;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class MediaDescriptor {
 	private final int id;
 	private final String title;
@@ -60,5 +63,21 @@ public class MediaDescriptor {
 	@Override
 	public String toString() {
 		return title;
+	}
+	
+	public JSONObject toJSONObject() {
+		JSONObject result = new JSONObject();
+		
+		try {
+			result.put("id", id);
+			result.put("title", title);
+			result.put("artist", artist);
+			result.put("album", album);
+			result.put("genre", genre);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 }
