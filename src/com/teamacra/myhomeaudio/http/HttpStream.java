@@ -1,6 +1,7 @@
 package com.teamacra.myhomeaudio.http;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -124,9 +125,16 @@ public class HttpStream extends HttpBase {
 	public boolean assignNodes(Stream stream, ArrayList<Node> nodes) {
 		JSONObject requestObject = new JSONObject();
 		
+		JSONArray nodeArray = new JSONArray();
+		
+		for (Iterator<Node> i = nodes.iterator(); i.hasNext();) {
+			nodeArray.put(i.next().id());
+		}
+		
 		try {
 			requestObject.put("session", app.getSessionId());
 			requestObject.put("stream", stream.id());
+			requestObject.put("assignedNodes", nodeArray);
 			
 			JSONObject responseObject = executePostRequest("/stream/assign", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
