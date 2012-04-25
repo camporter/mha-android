@@ -38,6 +38,6 @@ public class Node {
 	}
 
 	public String toString() {
-		return id + " " + name;
+		return name;
 	}
 }

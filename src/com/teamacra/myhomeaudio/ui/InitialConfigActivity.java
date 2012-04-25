@@ -144,7 +144,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			this.startActivity(intent);
 		}
 	}
-	
+
 	public void onDestroy() {
 		super.onDestroy();
 		unregisterReceiver(mReceiver);
@@ -403,8 +403,10 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		}
 
 		public void receiveDevice(String name, String bluetoothAddress, int rssi) {
-			configManager.storeDeviceSignal(mNodeList.get(nextNodeIndex), name,
-					bluetoothAddress, rssi);
+			if (nextNodeIndex < mNodeList.size()) {
+				configManager.storeDeviceSignal(mNodeList.get(nextNodeIndex),
+						name, bluetoothAddress, rssi);
+			}
 		}
 	}
 
