@@ -64,7 +64,7 @@ public class ConfigurationManager {
 			// Try to get the signature for the current node that the signal is
 			// being recorded under
 			NodeSignature currentNodeSignature = getSignature(currentNode);
-			if (currentNodeSignature != null) {
+			if (currentNodeSignature == null) {
 				// The current node does not have a signature yet, so create it
 				// and add it to the list of signatures.
 				currentNodeSignature = new NodeSignature(currentNode);

@@ -403,7 +403,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		}
 
 		public void receiveDevice(String name, String bluetoothAddress, int rssi) {
-			if (nextNodeIndex < mNodeList.size()) {
+			if (nextNodeIndex < mNodeList.size() && rssi != Integer.MIN_VALUE) {
 				configManager.storeDeviceSignal(mNodeList.get(nextNodeIndex),
 						name, bluetoothAddress, rssi);
 			}
@@ -423,7 +423,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 					((NodeConfigTask) mNodeConfigTask).receiveDevice(
 							intent.getStringExtra("deviceName"),
 							intent.getStringExtra("deviceAddress"),
-							intent.getIntExtra("rssi", Integer.MIN_VALUE));
+							intent.getIntExtra("deviceRssi", Integer.MIN_VALUE));
 				}
 				Log.i(TAG, "Name: " + intent.getStringExtra("deviceName"));
 			}
