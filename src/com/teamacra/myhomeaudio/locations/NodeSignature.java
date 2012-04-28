@@ -49,9 +49,17 @@ public class NodeSignature {
 				// This node already has a signal range in this signature,
 				// so just pass the rssi value to the NodeSignalRange.
 				nextSignalRange.storeRSSIValue(rssi);
+				return true;
 			}
 		}
-		return false;
+		
+		// Node not in node signal ranges list yet
+		NodeSignalRange newNodeSignalRange = new NodeSignalRange(node);
+		newNodeSignalRange.storeRSSIValue(rssi);
+		nodeSignalRanges.add(newNodeSignalRange);
+		
+		
+		return true;
 	}
 
 	/**

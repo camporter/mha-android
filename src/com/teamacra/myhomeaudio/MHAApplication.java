@@ -51,7 +51,7 @@ public class MHAApplication extends Application {
 		this.isConfigured = false;
 
 		checkBluetoothCapability();
-
+		stopBluetoothService();
 		Log.d(TAG, "Application created");
 	}
 
@@ -59,6 +59,7 @@ public class MHAApplication extends Application {
 	public void onTerminate() {
 		setLoggedOut();
 		Log.d(TAG, "Application terminated");
+		stopBluetoothService();
 		super.onTerminate();
 	}
 

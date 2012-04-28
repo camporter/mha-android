@@ -276,6 +276,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			ConfigurationManager configManager = ConfigurationManager
 					.getInstance(app);
 			HttpClient client = new HttpClient(app);
+			Log.d(TAG,"Config: "+configManager.getConfigurationJSON().toString());
 			return client.initialConfig(configManager.getConfigurationJSON());
 		}
 
@@ -406,6 +407,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 			if (nextNodeIndex < mNodeList.size() && rssi != Integer.MIN_VALUE) {
 				configManager.storeDeviceSignal(mNodeList.get(nextNodeIndex),
 						name, bluetoothAddress, rssi);
+				Log.d(TAG,"Adding Name:"+name+" Rssi:"+rssi);
 			}
 		}
 	}

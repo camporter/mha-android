@@ -72,9 +72,8 @@ public class ConfigurationManager {
 			}
 			
 			// Store the device and rssi value in the signature
-			currentNodeSignature.storeSignal(device, rssi);
 			
-			return true;
+			return currentNodeSignature.storeSignal(device, rssi);
 		}
 		return false;
 	}
