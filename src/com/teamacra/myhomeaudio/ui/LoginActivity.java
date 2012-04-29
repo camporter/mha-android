@@ -121,7 +121,17 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 	 */
 	private boolean checkBluetooth() {
 		BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		if (!bluetoothAdapter.isEnabled()) {
+		if (bluetoothAdapter == null) {
+			AlertDialog.Builder noBluetooth = new AlertDialog.Builder(this);
+			noBluetooth.setTitle("No Bluetooth Available");
+			noBluetooth.setMessage("Your Android device does not support bluetooth.");
+			noBluetooth.setNeutralButton("Quit", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					LoginActivity.this.finish();
+				}
+			});
+		} else if (!bluetoothAdapter.isEnabled()) {
 			Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivityForResult(enableBTIntent, 3);
 			return false;
@@ -174,13 +184,6 @@ public class LoginActivity extends SherlockActivity implements View.OnClickListe
 								LoginActivity.this.finish();
 							}
 						});
-				/*
-				 * failure.setNeutralButton("Ok", new
-				 * DialogInterface.OnClickListener() {
-				 * 
-				 * public void onClick(DialogInterface dialog, int which) {
-				 * failureDialog.dismiss(); } });
-				 */
 				failure.setPositiveButton(getText(R.string.retry),
 						new DialogInterface.OnClickListener() {
 

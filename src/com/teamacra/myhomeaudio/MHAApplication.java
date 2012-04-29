@@ -120,6 +120,11 @@ public class MHAApplication extends Application {
 		return this.port;
 	}
 
+	/**
+	 * Gets the local address assigned to the device through wifi.
+	 * 
+	 * @return The local address as a string, or null if wifi is not available.
+	 */
 	public String getLocalAddress() {
 		if (isWifiConnected()) {
 			WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
@@ -131,6 +136,11 @@ public class MHAApplication extends Application {
 		}
 	}
 
+	/**
+	 * Gets the MAC address for wifi on this device.
+	 * 
+	 * @return The MAC address as a string, or null if wifi is not available.
+	 */
 	public String getMacAddress() {
 		if (isWifiConnected()) {
 			WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
@@ -152,11 +162,12 @@ public class MHAApplication extends Application {
 	 */
 	public void startBluetoothService(Context c, boolean repeating) {
 		Intent serviceIntent = new Intent(c, BluetoothService.class);
-		
+
 		if (repeating) {
 			final AlarmManager alarmManager = (AlarmManager) this
 					.getSystemService(ALARM_SERVICE);
-			discoveryPendingIntent = PendingIntent.getService(c, 0, serviceIntent, 0);
+			discoveryPendingIntent = PendingIntent.getService(c, 0,
+					serviceIntent, 0);
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(System.currentTimeMillis());
 			alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
@@ -175,7 +186,7 @@ public class MHAApplication extends Application {
 					.getSystemService(ALARM_SERVICE);
 			alarmManager.cancel(discoveryPendingIntent);
 		}
-		
+
 		Intent serviceIntent = new Intent(this, BluetoothService.class);
 		this.stopService(serviceIntent);
 	}
@@ -231,10 +242,12 @@ public class MHAApplication extends Application {
 		ConnectivityManager connectivityManager = (ConnectivityManager) this
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo networkInfo = null;
+		
+		// Make sure we were able to get the ConnectivityManager
 		if (connectivityManager != null) {
+			// Get the wifi network information
 			networkInfo = connectivityManager
 					.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-			System.out.println(networkInfo.isConnected());
 		}
 		return networkInfo == null ? false : networkInfo.isConnected();
 	}
