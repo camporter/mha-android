@@ -127,7 +127,7 @@ public class NodeSignature {
 			for (Iterator<NodeSignalRange> i = nodeSignalRanges.iterator(); i.hasNext();) {
 				array.put(i.next().toJSON());
 			}
-			object.put("nodeSignalRanges", array);
+			object.put("foundNodes", array);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
