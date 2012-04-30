@@ -4,13 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.http.HttpSource;
 import com.teamacra.myhomeaudio.http.HttpStream;
 import com.teamacra.myhomeaudio.node.Node;
+import com.teamacra.myhomeaudio.source.Source;
 import com.teamacra.myhomeaudio.stream.Stream;
 
 public class StreamManager {
 	private ArrayList<Stream> streamList;
+	private ArrayList<Source> sourceList;
 	private HttpStream httpStream;
+	private HttpSource httpSource;
 	
 	private static StreamManager instance;
 
@@ -43,6 +47,17 @@ public class StreamManager {
 		}
 		return false;
 	}
+	
+	public synchronized boolean updateSources() {
+		ArrayList<Source> newSourceList = httpSource.getSourceList();
+		
+		if (newSourceList != null) {
+			sourceList.clear();
+			sourceList.addAll(newSourceList);
+			return true;
+		}
+		return false;
+	}
 
 	/**
 	 * Gets a list of Stream objects.
@@ -54,6 +69,10 @@ public class StreamManager {
 	 */
 	public ArrayList<Stream> getStreamList() {
 		return new ArrayList<Stream>(streamList);
+	}
+	
+	public ArrayList<Source> getSourceList() {
+		return new ArrayList<Source>(sourceList);
 	}
 
 	/**
@@ -87,6 +106,16 @@ public class StreamManager {
 			Stream nextStream = i.next();
 			if (nextStream.id() == id) {
 				return new Stream(nextStream);
+			}
+		}
+		return null;
+	}
+	
+	public Source getSource(int id) {
+		for (Iterator<Source> i = sourceList.iterator(); i.hasNext();) {
+			Source nextSource = i.next();
+			if (nextSource.id() == id) {
+				return new Source(nextSource);
 			}
 		}
 		return null;
