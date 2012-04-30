@@ -35,6 +35,7 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 	private boolean welcomeComplete = false;
 	private int nextNodeIndex = 0;
+	private int counter = 0;
 
 	private ArrayList<Node> mNodeList;
 	private ArrayAdapter<Node> mNodeAdapter;
@@ -309,29 +310,36 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 				successDialog.show();
 			} else {
 				// Configuration sending failed
-				AlertDialog.Builder failure = new AlertDialog.Builder(
-						InitialConfigActivity.this);
-				failure.setTitle("Configuration failed!");
-				failure.setMessage("Make sure your device can talk to the server over the network and try again.");
-				failure.setNeutralButton("OK",
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								failureDialog.dismiss();
-
-								// Restart the activity
-								Intent intent = new Intent(
-										InitialConfigActivity.this,
-										InitialConfigActivity.class);
-								InitialConfigActivity.this.finish();
-								InitialConfigActivity.this
-										.startActivity(intent);
-							}
-						});
-				failureDialog = failure.create();
-				failureDialog.show();
+				Log.d(TAG,"Sending Attempt: " + counter++);
+				if(counter < 10){
+					new SendConfigTask().execute();
+				}else{
+					AlertDialog.Builder failure = new AlertDialog.Builder(
+							InitialConfigActivity.this);
+					failure.setTitle("Configuration failed!");
+					failure.setMessage("Make sure your device can talk to the server over the network and try again.");
+					failure.setNeutralButton("OK",
+							new DialogInterface.OnClickListener() {
+	
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									failureDialog.dismiss();
+	
+									// Restart the activity
+									Intent intent = new Intent(
+											InitialConfigActivity.this,
+											InitialConfigActivity.class);
+									InitialConfigActivity.this.finish();
+									InitialConfigActivity.this
+											.startActivity(intent);
+								}
+							});
+					ConfigurationManager cm = ConfigurationManager.getInstance(app);
+					cm.resetSignatures();
+					failureDialog = failure.create();
+					failureDialog.show();
+				}
 			}
 		}
 
@@ -374,6 +382,10 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		protected Void doInBackground(Integer... params) {
 			Log.d(TAG, "Starting to Generate List");
 
+			//Make sure ConfigurationManager is cleared before starting
+			ConfigurationManager cm = ConfigurationManager.getInstance(app);
+			cm.resetSignatures();
+			
 			// Start the bluetooth service to go find devices
 			app.startBluetoothService(app, true);
 
