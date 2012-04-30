@@ -6,6 +6,7 @@ import com.teamacra.myhomeaudio.R;
 import com.teamacra.myhomeaudio.media.MediaDescriptor;
 import com.teamacra.myhomeaudio.source.Source;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ public class SourceFragment extends Fragment {
 	private ArrayAdapter mListAdapter;
 	private ListView mSourceListView;
 	private ArrayList<Source> mSourceList;
+	private OnSourceSelectedListener mListener;
 
 	public static SourceFragment newInstance() {
 		SourceFragment fragment = new SourceFragment();
@@ -47,6 +49,7 @@ public class SourceFragment extends Fragment {
 					int position, long id) {
 				Toast.makeText(getActivity(), mSourceList.get(position).name(),
 						Toast.LENGTH_SHORT).show();
+				mListener.onSourceSelected(mSourceList.get(position));
 			}
 		});
 		return view;
@@ -59,4 +62,20 @@ public class SourceFragment extends Fragment {
 			mListAdapter.notifyDataSetChanged();
 		}
 	}
+	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			mListener = (OnSourceSelectedListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()+"must implement OnSourceSelectedListener");
+		}
+	}
+	
+	public interface OnSourceSelectedListener {
+		public void onSourceSelected(Source source);
+	}
 }
+
+

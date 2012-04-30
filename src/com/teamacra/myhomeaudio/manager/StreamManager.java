@@ -6,6 +6,7 @@ import java.util.Iterator;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.http.HttpSource;
 import com.teamacra.myhomeaudio.http.HttpStream;
+import com.teamacra.myhomeaudio.media.MediaDescriptor;
 import com.teamacra.myhomeaudio.node.Node;
 import com.teamacra.myhomeaudio.source.Source;
 import com.teamacra.myhomeaudio.stream.Stream;
@@ -60,6 +61,17 @@ public class StreamManager {
 		}
 		return false;
 	}
+	
+	public synchronized Source updateSourceMedia(int sourceId) {
+		ArrayList<MediaDescriptor> newMediaList = httpSource.getSourceMedia(sourceId);
+		Source source = getSource(sourceId);
+		
+		if (newMediaList != null && source != null) {
+			source.setMediaList(newMediaList);
+			return source;
+		}
+		return null;
+	}
 
 	/**
 	 * Gets a list of Stream objects.
@@ -76,6 +88,8 @@ public class StreamManager {
 	public ArrayList<Source> getSourceList() {
 		return new ArrayList<Source>(sourceList);
 	}
+	
+	
 
 	/**
 	 * Get a Stream by its name.
@@ -107,7 +121,7 @@ public class StreamManager {
 		for (Iterator<Stream> i = streamList.iterator(); i.hasNext();) {
 			Stream nextStream = i.next();
 			if (nextStream.id() == id) {
-				return new Stream(nextStream);
+				return nextStream;
 			}
 		}
 		return null;
@@ -117,7 +131,7 @@ public class StreamManager {
 		for (Iterator<Source> i = sourceList.iterator(); i.hasNext();) {
 			Source nextSource = i.next();
 			if (nextSource.id() == id) {
-				return new Source(nextSource);
+				return nextSource;
 			}
 		}
 		return null;

@@ -40,8 +40,9 @@ public class Source {
 		return mediaList;
 	}
 	
-	public void setMediaList(ArrayList<MediaDescriptor> mediaList) {
-		this.mediaList = mediaList;
+	public void setMediaList(ArrayList<MediaDescriptor> newMediaList) {
+		this.mediaList.clear();
+		this.mediaList.addAll(newMediaList);
 	}
 	
 	public String toString() {

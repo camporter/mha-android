@@ -35,6 +35,7 @@ import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
 import com.teamacra.myhomeaudio.manager.NodeManager;
 import com.teamacra.myhomeaudio.manager.StreamManager;
+import com.teamacra.myhomeaudio.media.MediaDescriptor;
 import com.teamacra.myhomeaudio.node.Node;
 import com.teamacra.myhomeaudio.source.Source;
 import com.teamacra.myhomeaudio.stream.Stream;
@@ -46,8 +47,8 @@ import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
 
 public class MyHomeAudioActivity extends SherlockFragmentActivity implements
-		OnNavigationListener {
-	
+		OnNavigationListener, SourceFragment.OnSourceSelectedListener {
+
 	private MHAApplication app;
 
 	private TabAdapter mAdapter;
@@ -382,13 +383,39 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		protected ArrayList<Source> doInBackground(String... params) {
 			StreamManager sm = StreamManager.getInstance(app);
 			sm.updateSources();
-			
+
 			return sm.getSourceList();
 		}
-		
+
 		protected void onPostExecute(ArrayList<Source> result) {
 			if (result != null) {
 				mSourceFragment.updateSourceList(result);
+			}
+		}
+	}
+
+	private class UpdateSourceMediaTask extends
+			AsyncTask<Integer, Void, Source> {
+
+		protected void onPreExecute() {
+			Toast.makeText(MyHomeAudioActivity.this,
+					"Getting media for source...", Toast.LENGTH_SHORT).show();
+		}
+
+		@Override
+		protected Source doInBackground(Integer... params) {
+			int sourceId = params[0];
+			StreamManager sm = StreamManager.getInstance(app);
+			return sm.updateSourceMedia(sourceId);
+		}
+		
+		protected void onPostExecute(Source result) {
+			if (result != null) {
+				// Update worked
+				mSongFragment.updateSongList(result.mediaList());
+			}
+			else {
+				// update failed
 			}
 		}
 
@@ -432,5 +459,14 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		public String getTitle(int position) {
 			return CONTENT[position % CONTENT.length].toUpperCase();
 		}
+	}
+
+	/**
+	 * Captures when a source is selected in the source fragment.
+	 */
+	@Override
+	public void onSourceSelected(Source source) {
+		// Do something
+		new UpdateSourceMediaTask().execute(source.id());
 	}
 }
