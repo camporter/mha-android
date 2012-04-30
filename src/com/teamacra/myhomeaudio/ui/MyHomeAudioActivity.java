@@ -158,6 +158,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		// Run the update stuff
 		new UpdateStreamsTask().execute("");
 		new UpdateNodesTask().execute("");
+		new UpdateSourcesTask().execute("");
 
 	}
 
@@ -387,7 +388,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		
 		protected void onPostExecute(ArrayList<Source> result) {
 			if (result != null) {
-				// Do stuff here...
+				mSourceFragment.updateSourceList(result);
 			}
 		}
 

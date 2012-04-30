@@ -20,7 +20,9 @@ public class StreamManager {
 
 	private StreamManager(MHAApplication app) {
 		httpStream = new HttpStream(app);
+		httpSource = new HttpSource(app);
 		streamList = new ArrayList<Stream>();
+		sourceList = new ArrayList<Source>();
 	}
 	
 	public synchronized static StreamManager getInstance(MHAApplication app) {

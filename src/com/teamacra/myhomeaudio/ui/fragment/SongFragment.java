@@ -44,9 +44,10 @@ public class SongFragment extends Fragment {
 		mMediaListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
-				Toast.makeText(getActivity(), mMediaList.get(position).title(), Toast.LENGTH_SHORT).show();
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Toast.makeText(getActivity(), mMediaList.get(position).title(),
+						Toast.LENGTH_SHORT).show();
 			}
 		});
 		return view;
@@ -55,12 +56,14 @@ public class SongFragment extends Fragment {
 	/**
 	 * Clears any previous songs out of the list, adds a new song
 	 * 
-	 * @param media
+	 * @param newMedia
 	 */
-	public void updateSongList(ArrayList<MediaDescriptor> media) {
-		mMediaList.clear();
-		mMediaList.addAll(media);
-		mListAdapter.notifyDataSetChanged();
+	public void updateSongList(ArrayList<MediaDescriptor> newMedia) {
+		if (newMedia != null) {
+			mMediaList.clear();
+			mMediaList.addAll(newMedia);
+			mListAdapter.notifyDataSetChanged();
+		}
 	}
 
 	private void playMedia(MediaDescriptor descriptor) {
