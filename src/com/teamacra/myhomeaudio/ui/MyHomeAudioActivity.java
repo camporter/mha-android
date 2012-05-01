@@ -47,7 +47,7 @@ import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
 
 public class MyHomeAudioActivity extends SherlockFragmentActivity implements
-		OnNavigationListener, SourceFragment.OnSourceSelectedListener {
+		OnNavigationListener, SourceFragment.OnSourceSelectedListener, SongFragment.OnSongSelectedListener {
 
 	private MHAApplication app;
 
@@ -124,15 +124,17 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 				new AssignNodesTask().execute(newlyAssignedNodeList);
 			}
 		});
-
+		
 		// Setup the fragments
 		mSongFragment = SongFragment.newInstance();
 		mSourceFragment = SourceFragment.newInstance();
+		
 
 		// Setup the tabpages
 		mAdapter = new TabAdapter(getSupportFragmentManager());
 		mPager = (ViewPager) findViewById(R.id.tabPager);
 		mPager.setAdapter(mAdapter);
+		mPager.setOffscreenPageLimit(6); // prevent ViewPager from destroying any fragments
 		PageIndicator mIndicator = (TabPageIndicator) findViewById(R.id.tabIndicator);
 		mIndicator.setViewPager(mPager);
 
@@ -466,7 +468,11 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	 */
 	@Override
 	public void onSourceSelected(Source source) {
-		// Do something
 		new UpdateSourceMediaTask().execute(source.id());
+	}
+	
+	@Override
+	public void onSongSelected(MediaDescriptor song) {
+		// Do something
 	}
 }

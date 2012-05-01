@@ -2,6 +2,7 @@ package com.teamacra.myhomeaudio.ui.fragment;
 
 import java.util.ArrayList;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ public class SongFragment extends Fragment {
 	private ArrayAdapter mListAdapter;
 	private ListView mMediaListView;
 	private ArrayList<MediaDescriptor> mMediaList;
+	private OnSongSelectedListener mListener;
 
 	public static SongFragment newInstance() {
 		SongFragment fragment = new SongFragment();
@@ -36,7 +38,6 @@ public class SongFragment extends Fragment {
 		View view = inflater.inflate(R.layout.song_fragment, container, false);
 
 		mMediaList = new ArrayList<MediaDescriptor>();
-		mMediaList.add(new MediaDescriptor(0, "I like music", "", "", ""));
 		mListAdapter = new ArrayAdapter<MediaDescriptor>(this.getActivity(),
 				android.R.layout.simple_list_item_1, mMediaList);
 		mMediaListView = (ListView) view.findViewById(R.id.songListView);
@@ -65,8 +66,18 @@ public class SongFragment extends Fragment {
 			mListAdapter.notifyDataSetChanged();
 		}
 	}
-
-	private void playMedia(MediaDescriptor descriptor) {
-		this.getActivity();
+	
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			mListener = (OnSongSelectedListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString() + " must implement OnSongSelectedListener");
+		}
+	}
+	
+	public interface OnSongSelectedListener {
+		public void onSongSelected(MediaDescriptor song);
 	}
 }
