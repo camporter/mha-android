@@ -107,6 +107,10 @@ public class MHAApplication extends Application {
 	public boolean isConfigured() {
 		return this.isConfigured;
 	}
+	
+	public void setConfigured(boolean isConfigured){ 
+		this.isConfigured = isConfigured;
+	}
 
 	public void setServerAddress(String serverAddress) {
 		this.serverAddress = serverAddress;

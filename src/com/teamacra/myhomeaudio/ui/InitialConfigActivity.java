@@ -288,6 +288,8 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 				// Configuration was sent successfully
 				AlertDialog.Builder success = new AlertDialog.Builder(
 						InitialConfigActivity.this);
+				
+				app.setConfigured(true);
 				success.setTitle("Configuration complete!");
 				success.setMessage("Your device is now configured to use My Home Audio.");
 				success.setNeutralButton("Done",
