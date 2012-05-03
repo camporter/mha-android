@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -33,12 +35,19 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
+import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
+import com.teamacra.myhomeaudio.http.HttpClient;
+import com.teamacra.myhomeaudio.http.StatusCode;
+import com.teamacra.myhomeaudio.manager.ConfigurationManager;
+import com.teamacra.myhomeaudio.manager.LocationManager;
 import com.teamacra.myhomeaudio.manager.NodeManager;
 import com.teamacra.myhomeaudio.manager.StreamManager;
 import com.teamacra.myhomeaudio.media.MediaDescriptor;
 import com.teamacra.myhomeaudio.node.Node;
 import com.teamacra.myhomeaudio.source.Source;
 import com.teamacra.myhomeaudio.stream.Stream;
+import com.teamacra.myhomeaudio.ui.InitialConfigActivity.NodeConfigTask;
+import com.teamacra.myhomeaudio.ui.InitialConfigActivity.SendConfigTask;
 import com.teamacra.myhomeaudio.ui.fragment.SongFragment;
 import com.teamacra.myhomeaudio.ui.fragment.SourceFragment;
 import com.teamacra.myhomeaudio.ui.fragment.TestFragment;
@@ -47,7 +56,8 @@ import com.viewpagerindicator.TabPageIndicator;
 import com.viewpagerindicator.TitleProvider;
 
 public class MyHomeAudioActivity extends SherlockFragmentActivity implements
-		OnNavigationListener, SourceFragment.OnSourceSelectedListener, SongFragment.OnSongSelectedListener {
+		OnNavigationListener, SourceFragment.OnSourceSelectedListener,
+		SongFragment.OnSongSelectedListener {
 
 	private MHAApplication app;
 
@@ -72,6 +82,10 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	private SongFragment mSongFragment;
 	private SourceFragment mSourceFragment;
 
+	private String TAG = "MyHomeAudioActivity";
+	AsyncTask<String, Void, Integer> mSendLocationTask;
+	private int counter = 0;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +107,16 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(mStreamAdapter, this);
 
+		// Bluetooth Receiver Register
+		registerReceiver(mReceiver, new IntentFilter(
+				BluetoothService.DISCOVERY_START));
+		registerReceiver(mReceiver, new IntentFilter(
+				BluetoothService.DEVICE_UPDATE));
+		registerReceiver(mReceiver, new IntentFilter(
+				BluetoothService.DISCOVERY_FINISH));
+
+		mSendLocationTask = new SendLocationTask().execute();
+		
 		// Setup the node list
 		mNodeList = new ArrayList<Node>();
 
@@ -124,17 +148,17 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 				new AssignNodesTask().execute(newlyAssignedNodeList);
 			}
 		});
-		
+
 		// Setup the fragments
 		mSongFragment = SongFragment.newInstance();
 		mSourceFragment = SourceFragment.newInstance();
-		
 
 		// Setup the tabpages
 		mAdapter = new TabAdapter(getSupportFragmentManager());
 		mPager = (ViewPager) findViewById(R.id.tabPager);
 		mPager.setAdapter(mAdapter);
-		mPager.setOffscreenPageLimit(6); // prevent ViewPager from destroying any fragments
+		mPager.setOffscreenPageLimit(6); // prevent ViewPager from destroying
+											// any fragments
 		PageIndicator mIndicator = (TabPageIndicator) findViewById(R.id.tabIndicator);
 		mIndicator.setViewPager(mPager);
 
@@ -173,6 +197,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	public void onDestroy() {
 		app.stopBluetoothService();
 		super.onDestroy();
+		unregisterReceiver(mReceiver);
 	}
 
 	@Override
@@ -410,17 +435,58 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 			StreamManager sm = StreamManager.getInstance(app);
 			return sm.updateSourceMedia(sourceId);
 		}
-		
+
 		protected void onPostExecute(Source result) {
 			if (result != null) {
 				// Update worked
 				mSongFragment.updateSongList(result.mediaList());
-			}
-			else {
+			} else {
 				// update failed
 			}
 		}
 
+	}
+
+	/**
+	 * Task to send the configuration off to the server.
+	 */
+	protected class SendLocationTask extends AsyncTask<String, Void, Integer> {
+		LocationManager locationManager = null;
+		
+		protected void onPreExecute() {
+			Log.d(TAG, "Starting SendLocationTask");
+		}
+
+		protected Integer doInBackground(String... notUsed) {
+			locationManager = LocationManager.getInstance(app);
+			while (!isCancelled()) {
+				// Wait until the task is cancelled
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
+			HttpClient client = new HttpClient(app);
+			Log.d(TAG, "Location: "
+					+ locationManager.getLocationJSONArray().toString());
+			return client.location(locationManager.getLocationJSONArray());
+		}
+
+		protected void onPostExecute(Integer statusCode) {
+			locationManager = LocationManager.getInstance(app);
+			locationManager.clear();
+			mSendLocationTask = new SendLocationTask().execute();
+		}
+
+		public void addDevice(String name, String bluetoothAddress, int rssi) {
+			Log.d(TAG,"Adding Device "+ name + " "+ rssi);
+			locationManager = LocationManager.getInstance(app);
+			if (rssi != Integer.MIN_VALUE) {
+				locationManager.storeNode(name, bluetoothAddress, rssi);
+			}
+		}
 	}
 
 	private class TabAdapter extends FragmentPagerAdapter implements
@@ -470,9 +536,39 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	public void onSourceSelected(Source source) {
 		new UpdateSourceMediaTask().execute(source.id());
 	}
-	
+
 	@Override
 	public void onSongSelected(MediaDescriptor song) {
+		// TODO
 		// Do something
 	}
+
+	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+
+			if (BluetoothService.DISCOVERY_START.equals(action)) {
+				Log.d(TAG,"Starting SendLocationTask");
+				mSendLocationTask = new SendLocationTask().execute();
+			} else if (BluetoothService.DEVICE_UPDATE.equals(action)) {
+				if (mSendLocationTask != null) {
+					((SendLocationTask) mSendLocationTask)
+							.addDevice(intent.getStringExtra("deviceName"),
+									intent.getStringExtra("deviceAddress"),
+									intent.getIntExtra("deviceRssi",
+											Integer.MIN_VALUE));
+				}
+				Log.i(TAG, "Device Found Name: " + intent.getStringExtra("deviceName") + " "
+						+ intent.getIntExtra("deviceRssi", Integer.MIN_VALUE));
+			} else if (BluetoothService.DISCOVERY_FINISH.equals(action)) {
+				if(mSendLocationTask != null){
+					Log.d(TAG, "SendLocationTask stopping");
+					mSendLocationTask.cancel(true);
+					mSendLocationTask = null;
+				}
+			}
+		}
+	};
 }
