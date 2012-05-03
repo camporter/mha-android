@@ -70,7 +70,6 @@ public class LocationManager {
 				Log.d(TAG,"Replacing " + node.name() + " rssi " + device.rssi + " to "+rssi);
 			}
 		}
-			devices.add(new Device(node.id(), rssi));
 	
 		return false;
 	}

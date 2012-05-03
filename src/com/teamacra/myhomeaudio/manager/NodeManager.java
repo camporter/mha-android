@@ -63,7 +63,7 @@ public class NodeManager {
 	 * @return ArrayList of Node within manager
 	 */
 	public ArrayList<Node> getNodeList(boolean onlyActive) {
-
+		updateNodes();
 		if (onlyActive) {
 			ArrayList<Node> activeList = new ArrayList<Node>();
 			for (Iterator<Node> i = nodeList.iterator(); i.hasNext();) {
@@ -87,6 +87,7 @@ public class NodeManager {
 	 * @return The Node object, or null if a matching node is not found.
 	 */
 	public Node getNode(int id) {
+		updateNodes();
 		for (Iterator<Node> i = nodeList.iterator(); i.hasNext();) {
 			Node nextNode = i.next();
 			if (nextNode.id() == id) {
@@ -105,6 +106,7 @@ public class NodeManager {
 	 * @return The Node object, or null if a matching node is not found.
 	 */
 	public Node getNode(String name, String bluetoothAddress, boolean isActive) {
+		updateNodes();
 		for (Iterator<Node> i = nodeList.iterator(); i.hasNext();) {
 			Node nextNode = i.next();
 			if (nextNode.name().equals(name)
@@ -114,6 +116,10 @@ public class NodeManager {
 			}
 		}
 		return null;
+	}
+	
+	public void forceUpdateNodes(){
+		while(!updateNodes());
 	}
 	
 	/**

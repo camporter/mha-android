@@ -451,14 +451,12 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	 * Task to send the configuration off to the server.
 	 */
 	protected class SendLocationTask extends AsyncTask<String, Void, Void> {
-		LocationManager locationManager = null;
 
 		protected void onPreExecute() {
 			Log.d(TAG, "Starting SendLocationTask");
 		}
 
 		protected Void doInBackground(String... notUsed) {
-			locationManager = LocationManager.getInstance(app);
 			while (!isCancelled()) {
 				// Wait until the task is cancelled
 				try {
@@ -471,17 +469,19 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		}
 
 		protected void onCancelled() {
+			LocationManager locationManager = LocationManager.getInstance(app);
 			HttpClient client = new HttpClient(app);
 			Log.d(TAG, "Location: "
 					+ locationManager.getLocationJSONArray().toString());
-			client.location(locationManager.getLocationJSONArray());
+			counter = 0;
+			while(client.location(locationManager.getLocationJSONArray()) != StatusCode.STATUS_OK && counter < 10);
 			locationManager = LocationManager.getInstance(app);
 			locationManager.clear();
 			mSendLocationTask = new SendLocationTask().execute();
 		}
 
 		public void addDevice(String name, String bluetoothAddress, int rssi) {
-			locationManager = LocationManager.getInstance(app);
+			LocationManager locationManager = LocationManager.getInstance(app);
 			if (rssi != Integer.MIN_VALUE
 					&& locationManager.storeNode(name, bluetoothAddress, rssi)) {
 				Log.d(TAG, "Added Device: " + name + " " + rssi);
