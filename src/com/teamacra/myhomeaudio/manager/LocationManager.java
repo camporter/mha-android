@@ -2,6 +2,7 @@ package com.teamacra.myhomeaudio.manager;
 
 import java.util.ArrayList;
 
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,11 +10,13 @@ import org.json.JSONObject;
 import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.locations.NodeSignature;
 import com.teamacra.myhomeaudio.node.Node;
+import android.util.Log;
 
 public class LocationManager {
-	private ArrayList<Device> nodes;
+	private ArrayList<Device> devices;
 	private static LocationManager instance;
 	private MHAApplication app;
+	private String TAG = "LocationManager";
 	
 	private class Device{
 		private final int id;
@@ -44,7 +47,7 @@ public class LocationManager {
 
 	private LocationManager(MHAApplication app) {
 		this.app = app;
-		this.nodes = new ArrayList<Device>();
+		this.devices = new ArrayList<Device>();
 	}
 
 	public synchronized static LocationManager getInstance(
@@ -59,22 +62,37 @@ public class LocationManager {
 		NodeManager nm = NodeManager.getInstance(app);
 		Node node = nm.getNode(name, bluetoothAddress,  true);
 		if(node != null){
-			nodes.add(new Device(node.id(), rssi));
-			return true;
+			Device device = getDevice(node);
+			if(getDevice(node) == null){
+				devices.add(new Device(node.id(),rssi));				
+			}else{
+				devices.set(devices.indexOf(device),new Device(node.id(),rssi));
+				Log.d(TAG,"Replacing " + node.name() + " rssi " + device.rssi + " to "+rssi);
+			}
 		}
+			devices.add(new Device(node.id(), rssi));
+	
 		return false;
 	}
 	
+	private Device getDevice(Node node) {
+		for(Device device : devices){
+			if(device.id == node.id()){
+				return device;
+			}
+		}
+		return null;
+	}
+
 	public void clear(){
-		nodes.clear();
+		devices.clear();
 	}
 	
 	public JSONArray getLocationJSONArray(){
 		JSONArray array = new JSONArray();
-		for(Device device : nodes){
-			array.put(new Device(device));
+		for(Device device : devices){
+			array.put(new Device(device).toJSONObject());
 		}
 		return array;
 	}
-
 }

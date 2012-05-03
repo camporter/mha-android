@@ -83,7 +83,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	private SourceFragment mSourceFragment;
 
 	private String TAG = "MyHomeAudioActivity";
-	AsyncTask<String, Void, Integer> mSendLocationTask;
+	AsyncTask<String, Void, Void> mSendLocationTask;
 	private int counter = 0;
 
 	/** Called when the activity is first created. */
@@ -116,7 +116,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 				BluetoothService.DISCOVERY_FINISH));
 
 		mSendLocationTask = new SendLocationTask().execute();
-		
+
 		// Setup the node list
 		mNodeList = new ArrayList<Node>();
 
@@ -450,14 +450,14 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	/**
 	 * Task to send the configuration off to the server.
 	 */
-	protected class SendLocationTask extends AsyncTask<String, Void, Integer> {
+	protected class SendLocationTask extends AsyncTask<String, Void, Void> {
 		LocationManager locationManager = null;
-		
+
 		protected void onPreExecute() {
 			Log.d(TAG, "Starting SendLocationTask");
 		}
 
-		protected Integer doInBackground(String... notUsed) {
+		protected Void doInBackground(String... notUsed) {
 			locationManager = LocationManager.getInstance(app);
 			while (!isCancelled()) {
 				// Wait until the task is cancelled
@@ -467,24 +467,24 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 					e.printStackTrace();
 				}
 			}
+			return null;
+		}
 
+		protected void onCancelled() {
 			HttpClient client = new HttpClient(app);
 			Log.d(TAG, "Location: "
 					+ locationManager.getLocationJSONArray().toString());
-			return client.location(locationManager.getLocationJSONArray());
-		}
-
-		protected void onPostExecute(Integer statusCode) {
+			client.location(locationManager.getLocationJSONArray());
 			locationManager = LocationManager.getInstance(app);
 			locationManager.clear();
 			mSendLocationTask = new SendLocationTask().execute();
 		}
 
 		public void addDevice(String name, String bluetoothAddress, int rssi) {
-			Log.d(TAG,"Adding Device "+ name + " "+ rssi);
 			locationManager = LocationManager.getInstance(app);
-			if (rssi != Integer.MIN_VALUE) {
-				locationManager.storeNode(name, bluetoothAddress, rssi);
+			if (rssi != Integer.MIN_VALUE
+					&& locationManager.storeNode(name, bluetoothAddress, rssi)) {
+				Log.d(TAG, "Added Device: " + name + " " + rssi);
 			}
 		}
 	}
@@ -550,9 +550,15 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 			String action = intent.getAction();
 
 			if (BluetoothService.DISCOVERY_START.equals(action)) {
-				Log.d(TAG,"Starting SendLocationTask");
+				Log.d(TAG, "Starting SendLocationTask");
 				mSendLocationTask = new SendLocationTask().execute();
 			} else if (BluetoothService.DEVICE_UPDATE.equals(action)) {
+				Log.i(TAG,
+						"Device Found Name: "
+								+ intent.getStringExtra("deviceName")
+								+ " "
+								+ intent.getIntExtra("deviceRssi",
+										Integer.MIN_VALUE));
 				if (mSendLocationTask != null) {
 					((SendLocationTask) mSendLocationTask)
 							.addDevice(intent.getStringExtra("deviceName"),
@@ -560,10 +566,9 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 									intent.getIntExtra("deviceRssi",
 											Integer.MIN_VALUE));
 				}
-				Log.i(TAG, "Device Found Name: " + intent.getStringExtra("deviceName") + " "
-						+ intent.getIntExtra("deviceRssi", Integer.MIN_VALUE));
 			} else if (BluetoothService.DISCOVERY_FINISH.equals(action)) {
-				if(mSendLocationTask != null){
+				Log.d(TAG, "DiscoveryService Stopping");
+				if (mSendLocationTask != null) {
 					Log.d(TAG, "SendLocationTask stopping");
 					mSendLocationTask.cancel(true);
 					mSendLocationTask = null;
