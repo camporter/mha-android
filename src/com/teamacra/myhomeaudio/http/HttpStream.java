@@ -11,6 +11,7 @@ import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.media.MediaDescriptor;
 import com.teamacra.myhomeaudio.node.Node;
 import com.teamacra.myhomeaudio.stream.Stream;
+import com.teamacra.myhomeaudio.stream.StreamAction;
 
 public class HttpStream extends HttpBase {
 
@@ -92,11 +93,13 @@ public class HttpStream extends HttpBase {
 		return false;
 	}
 
-	public boolean play(Stream stream, MediaDescriptor mediaDescriptor) {
+	public boolean play(Stream stream, int descriptorId, int sourceId) {
 		JSONObject requestObject = new JSONObject();
 		try {
 			requestObject.put("session", app.getSessionId());
-			requestObject.put("media", mediaDescriptor.toJSONObject());
+			requestObject.put("media", descriptorId);
+			requestObject.put("source", sourceId);
+			requestObject.put("stream", stream.id());
 			JSONObject responseObject = executePostRequest("/stream/play", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
 				return true;
@@ -107,11 +110,13 @@ public class HttpStream extends HttpBase {
 		return false;
 	}
 
-	public boolean pause() {
+	public boolean pause(Stream stream) {
 		JSONObject requestObject = new JSONObject();
 		try {
 			requestObject.put("session", app.getSessionId());
-			JSONObject responseObject = executePostRequest("/song/pause", requestObject);
+			requestObject.put("stream", stream.id());
+			requestObject.put("action", StreamAction.PAUSE);
+			JSONObject responseObject = executePostRequest("/stream/action", requestObject);
 			if (responseObject != null && responseObject.getInt("status") == StatusCode.STATUS_OK) {
 				return true;
 			}

@@ -20,12 +20,14 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -37,6 +39,7 @@ import com.teamacra.myhomeaudio.MHAApplication;
 import com.teamacra.myhomeaudio.R;
 import com.teamacra.myhomeaudio.bluetooth.BluetoothService;
 import com.teamacra.myhomeaudio.http.HttpClient;
+import com.teamacra.myhomeaudio.http.HttpStream;
 import com.teamacra.myhomeaudio.http.StatusCode;
 import com.teamacra.myhomeaudio.manager.ConfigurationManager;
 import com.teamacra.myhomeaudio.manager.LocationManager;
@@ -46,6 +49,7 @@ import com.teamacra.myhomeaudio.media.MediaDescriptor;
 import com.teamacra.myhomeaudio.node.Node;
 import com.teamacra.myhomeaudio.source.Source;
 import com.teamacra.myhomeaudio.stream.Stream;
+import com.teamacra.myhomeaudio.stream.StreamAction;
 import com.teamacra.myhomeaudio.ui.InitialConfigActivity.NodeConfigTask;
 import com.teamacra.myhomeaudio.ui.InitialConfigActivity.SendConfigTask;
 import com.teamacra.myhomeaudio.ui.fragment.SongFragment;
@@ -64,7 +68,11 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	private TabAdapter mAdapter;
 
 	private ViewPager mPager;
+	
+	private Source mActiveSource;
 
+	private ImageButton mPlayPauseButton;
+	
 	// Add Stream properties
 	private EditText mAddStreamEditText;
 	private AlertDialog mAddStreamDialog;
@@ -72,6 +80,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	// Stream stuff
 	private ArrayList<Stream> mStreamList;
 	private ArrayAdapter<Stream> mStreamAdapter;
+	private Stream mActiveStream;
 
 	// Node stuff
 	private ArrayList<Node> mNodeList;
@@ -96,6 +105,17 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 		setTheme(R.style.Theme_Sherlock);
 		setContentView(R.layout.main);
 
+		mPlayPauseButton = (ImageButton) findViewById(R.id.playPauseButton);
+		mPlayPauseButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				new ActionMediaTask().execute(StreamAction.PAUSE);
+				
+			}
+			
+		});
+		
 		// Setup the action bar
 		Context context = getSupportActionBar().getThemedContext();
 		mStreamList = new ArrayList<Stream>();
@@ -103,6 +123,7 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 				R.layout.sherlock_spinner_item, mStreamList);
 		mStreamAdapter
 				.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+		//mActiveStream = mStreamAdapter.getItem(0);
 
 		getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		getSupportActionBar().setListNavigationCallbacks(mStreamAdapter, this);
@@ -136,7 +157,19 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 				SparseBooleanArray checked = mNodeListView
 						.getCheckedItemPositions();
 				for (int i = 0; i < checked.size(); i++) {
+					
+					if (i == 0) {
+						if (checked.valueAt(i) == true) {
+							app.setFollowing(true);
+						}
+						else {
+							app.setFollowing(false);
+						}
+					}
+					
 					if (checked.valueAt(i) == true) {
+						
+						
 						// Put nodes at the positions that are checked into the
 						// new list of assigned nodes for the current stream
 						newlyAssignedNodeList.add(mNodeList.get(checked
@@ -235,7 +268,8 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-
+		
+		mActiveStream = mStreamAdapter.getItem(itemPosition);
 		// Change the active stream
 		// Toast.makeText(this, "Selected " + mActiveStream,
 		// Toast.LENGTH_LONG).show();
@@ -465,19 +499,27 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 					e.printStackTrace();
 				}
 			}
+			
+			LocationManager locationManager = LocationManager.getInstance(app);
+			
+			if (app.isFollwing()) {
+				
+				HttpClient client = new HttpClient(app);
+				Log.d(TAG, "Location: "
+						+ locationManager.getLocationJSONArray().toString());
+				counter = 0;
+				while(client.location(locationManager.getLocationJSONArray(), mActiveStream) != StatusCode.STATUS_OK && counter < 10);
+				
+			}
+			
+			mSendLocationTask = new SendLocationTask().execute();
+			locationManager.clear();
+			
 			return null;
 		}
 
 		protected void onCancelled() {
-			LocationManager locationManager = LocationManager.getInstance(app);
-			HttpClient client = new HttpClient(app);
-			Log.d(TAG, "Location: "
-					+ locationManager.getLocationJSONArray().toString());
-			counter = 0;
-			while(client.location(locationManager.getLocationJSONArray()) != StatusCode.STATUS_OK && counter < 10);
-			locationManager = LocationManager.getInstance(app);
-			locationManager.clear();
-			mSendLocationTask = new SendLocationTask().execute();
+			
 		}
 
 		public void addDevice(String name, String bluetoothAddress, int rssi) {
@@ -487,6 +529,48 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 				Log.d(TAG, "Added Device: " + name + " " + rssi);
 			}
 		}
+	}
+	
+	protected class PlayMediaTask extends AsyncTask<Integer, Void, Boolean> {
+		
+		protected void onPreExecute() {
+			
+		}
+		
+		@Override
+		protected Boolean doInBackground(Integer... params) {
+			Integer descriptorId = params[0];
+			
+			HttpStream httpStream = new HttpStream(app);
+			
+			return httpStream.play(mActiveStream, descriptorId, mActiveSource.id());
+		}
+		
+		protected void onPostExecute(Boolean result) {
+			
+		}
+		
+	}
+	
+protected class ActionMediaTask extends AsyncTask<Integer, Void, Boolean> {
+		
+		protected void onPreExecute() {
+			
+		}
+		
+		@Override
+		protected Boolean doInBackground(Integer... params) {
+			Integer action = params[0];
+			
+			HttpStream httpStream = new HttpStream(app);
+			
+			return httpStream.pause(mActiveStream);
+		}
+		
+		protected void onPostExecute(Boolean result) {
+			
+		}
+		
 	}
 
 	private class TabAdapter extends FragmentPagerAdapter implements
@@ -535,12 +619,13 @@ public class MyHomeAudioActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onSourceSelected(Source source) {
 		new UpdateSourceMediaTask().execute(source.id());
+		mActiveSource = source;
 	}
 
 	@Override
 	public void onSongSelected(MediaDescriptor song) {
-		// TODO
-		// Do something
+		Log.d(TAG, "Song selected");
+		new PlayMediaTask().execute(song.id());
 	}
 
 	private final BroadcastReceiver mReceiver = new BroadcastReceiver() {

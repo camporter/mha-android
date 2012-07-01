@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.teamacra.myhomeaudio.MHAApplication;
+import com.teamacra.myhomeaudio.stream.Stream;
 
 public class HttpClient extends HttpBase {
 
@@ -96,11 +97,12 @@ public class HttpClient extends HttpBase {
 		return StatusCode.STATUS_FAILED;
 	}
 
-	public int location(JSONArray devices){
+	public int location(JSONArray devices, Stream stream){
 		JSONObject requestObject = new JSONObject();
 		try{
 			requestObject.put("session", app.getSessionId());
 			requestObject.put("locations",devices);
+			requestObject.put("stream", stream.id());
 			return executeSimplePostRequest("/client/locations",requestObject);
 		}catch(JSONException e){
 			e.printStackTrace();

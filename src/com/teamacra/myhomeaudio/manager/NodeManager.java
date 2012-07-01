@@ -106,7 +106,7 @@ public class NodeManager {
 	 * @return The Node object, or null if a matching node is not found.
 	 */
 	public Node getNode(String name, String bluetoothAddress, boolean isActive) {
-		updateNodes();
+		//updateNodes();
 		for (Iterator<Node> i = nodeList.iterator(); i.hasNext();) {
 			Node nextNode = i.next();
 			if (nextNode.name().equals(name)

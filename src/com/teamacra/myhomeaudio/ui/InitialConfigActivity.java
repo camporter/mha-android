@@ -139,11 +139,11 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		super.onResume();
 
 		// Check to make sure the user is not already configured
-		if (app.isConfigured()) {
+		/*if (app.isConfigured()) {
 			// User already configured, move past configuration
 			Intent intent = new Intent(this, MyHomeAudioActivity.class);
 			this.startActivity(intent);
-		}
+		}*/
 	}
 
 	public void onDestroy() {
@@ -175,6 +175,9 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 		if (!welcomeComplete) {
 			// Just pressed next on the welcome screen
 			welcomeComplete = true;
+			
+			ConfigurationManager configm = ConfigurationManager.getInstance(app);
+			configm.resetSignatures();
 
 			// Allow the refresh button to be visible
 			mRefreshButton.setVisibility(View.VISIBLE);
@@ -386,7 +389,6 @@ public class InitialConfigActivity extends SherlockFragmentActivity implements
 
 			//Make sure ConfigurationManager is cleared before starting
 			ConfigurationManager cm = ConfigurationManager.getInstance(app);
-			cm.resetSignatures();
 			
 			// Start the bluetooth service to go find devices
 			app.startBluetoothService(app, true);

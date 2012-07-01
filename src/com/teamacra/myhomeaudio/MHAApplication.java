@@ -33,6 +33,7 @@ public class MHAApplication extends Application {
 
 	private boolean isLoggedIn;
 	private boolean isConfigured;
+	private boolean isFollowing;
 	private String username;
 	private String password;
 	private String sessionId;
@@ -49,6 +50,7 @@ public class MHAApplication extends Application {
 		super.onCreate();
 		this.isLoggedIn = false;
 		this.isConfigured = false;
+		this.isFollowing = false;
 
 		checkBluetoothCapability();
 		stopBluetoothService();
@@ -106,6 +108,14 @@ public class MHAApplication extends Application {
 
 	public boolean isConfigured() {
 		return this.isConfigured;
+	}
+	
+	public boolean isFollwing() {
+		return this.isFollowing;
+	}
+	
+	public void setFollowing(boolean isFollowing) {
+		this.isFollowing = isFollowing;
 	}
 	
 	public void setConfigured(boolean isConfigured){ 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -47,6 +48,7 @@ public class SongFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
+				mListener.onSongSelected(mMediaList.get(position));
 				Toast.makeText(getActivity(), mMediaList.get(position).title(),
 						Toast.LENGTH_SHORT).show();
 			}
